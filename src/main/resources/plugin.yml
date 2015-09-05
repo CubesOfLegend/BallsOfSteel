@@ -2,9 +2,17 @@ name: BallsOfSteel
 main: com.cubesoflegend.ballsofsteel.Main
 version: 0.0.1
 depend: [MinigamesLib]
+permissions:
+   arenabuilder:
+      description: Permet a un joueur de mettre en place une arene
 commands:
    bos:
-      description: Commande de test
-      usage: /<command>
+      description: Commande principale du plugin.
+      usage: /bos <command>
+      permission: <plugin name>.basic
+      permission-message: You don't have <permission>
+   bos setspawn:
+      description: Permet de placer un spawn pour une arene et une equipe.
+      usage: /bos setspawn <arene> <Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc>
       permission: <plugin name>.basic
       permission-message: You don't have <permission>
