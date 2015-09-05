@@ -56,7 +56,7 @@ public class Main extends JavaPlugin {
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-    	
+    	/*
 		if(label.equalsIgnoreCase("bos")){
 			if (!(sender instanceof Player)) {
 				sender.sendMessage("Merci d'executer cette commande en jeu");
@@ -64,14 +64,15 @@ public class Main extends JavaPlugin {
 			}
 			Player p = (Player) sender;
 	    	if(args.length>0){
-	    		if(args[0].equalsIgnoreCase("setspawn") && sender.hasPermission("arenabuilder")){
+	    		if(args[0].equalsIgnoreCase("setspawn")){
 	    			return SpawnManager.addSpawn(this, args[1], p.getLocation(), args[2]);
 	    		}
-				else if(args[0].equalsIgnoreCase("removespawn") && sender.hasPermission("arenabuilder")){
+				else if(args[0].equalsIgnoreCase("removespawn")){
 					return SpawnManager.removeSpawn(this, args[1], p.getLocation(), args[2]);
 				}
 	    	}
 		}
+		*/
 		api.getCommandHandler().handleArgs(this, "bos", "/" + cmd.getName(), sender, args);
     	return true;
     }

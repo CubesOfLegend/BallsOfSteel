@@ -2,17 +2,105 @@ name: BallsOfSteel
 main: com.cubesoflegend.ballsofsteel.Main
 version: 0.0.1
 depend: [MinigamesLib]
-permissions:
-   arenabuilder:
-      description: Permet a un joueur de mettre en place une arene
 commands:
    bos:
-      description: Commande principale du plugin.
+      description: Affiche les commandes
       usage: /bos <command>
-      permission: <plugin name>.basic
-      permission-message: You don't have <permission>
    bos setspawn:
-      description: Permet de placer un spawn pour une arene et une equipe.
-      usage: /bos setspawn <arene> <Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc>
-      permission: <plugin name>.basic
-      permission-message: You don't have <permission>
+      description: Permet de placer un spawn pour une arène et une équipe.
+      usage: /bos setspawn <arene> [Bleu:1/Rouge:2/Jaune:3/Vert:4/Rose:5/Violet:6/Orange:7/Noir:8/Blanc:9]
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup".
+   bos removespawn:
+      description: Permet de supprimer un spawn pour une arène et une équipe.
+      usage: /bos removespawn <arene> [Bleu:1/Rouge:2/Jaune:3/Vert:4/Rose:5/Violet:6/Orange:7/Noir:8/Blanc:9]
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup".
+   bos setlobby:
+      description: Pose le point du lobby.
+      usage: /bos setlobby <arene>
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup".
+   bos setmainlobby:
+      description: Pose le point de réapparition après la fin de la partie.
+      usage: /bos setmainlobby <arene>
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup"
+   bos setbounds:
+      description: Définit les limites de l'arène
+      usage: /bos setbounds <arene> [low/high]
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup"
+   bos setspecbounds:
+      description: Définit la zone spectateur
+      usage: /bos setbounds <arene> [low/high]
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup"
+   bos savearena:
+      description: sauvegrde l'arène.
+      usage: /bos savearena <arene>
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup"
+   bos removearena:
+      description: Supprime l'arène.
+      usage: /bos removearena <arene>
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup"
+   bos seteammaxplayers:
+      description: Configure le nombre maximum de joueurs dans la team.
+      usage: /bos setteammaxplayers <arene> <team> <nombre>
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup"
+   bos seteamminplayers:
+      description: Configure le nombre minimum de joueurs dans la team.
+      usage: /bos setteamminplayers <arene> <team> <nombre>
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup"
+   bos setmaxplayers:
+      description: Configure le nombre maximum de joueurs dans l'arène
+      usage: /bos setteamminplayers <arene> <nombre>
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup"
+   bos setminplayers:
+      description: Configure le nombre minimum de joueurs dans l'arène
+      usage: /bos setteamminplayers <arene> <nombre>
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup"
+   bos setarenavip:
+      description: Passe l'arène en accès VIP
+      usage: /bos setarenavip <arene> [true/false]
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup"
+   bos join:
+      description: Rejoindre l'arène
+      usage: /bos join <arene>
+   bos leave:
+      description: Quitter l'arène
+      usage: /bos leave
+   bos start:
+      description: Forcer le lancement de l'arène
+      usage: /bos start <arene>
+      permission: mgbos.start
+      permission-message: Vous n'avez pas la permission "mgbos.start"
+   bos stop:
+      description: Forcer l'arrêt de l'arène
+      usage: /bos stop <arene>
+      permission: mgbos.stop
+      permission-message: Vous n'avez pas la permission "mgbos.stop"
+   bos list:
+      description: Lister les arènes
+      usage: /bos list
+   bos reload:
+      description: Reload la config
+      usage: /bos reload
+      permission: mgbos.stop
+      permission-message: Vous n'avez pas la permission "mgbos.stop"
+permissions:
+   mgbos.*:
+      description: Autorise l'accés à toutes les commandes du BallsOfSteel
+   mgbos.setup:
+      description: Autorise l'accés à la configuration d'une arène
+   mgbos.start:
+      description: Autorise le lancement forcé d'une arène 
+   mgbos.stop:
+      description: Autorise l'arret forcé d'une arène
