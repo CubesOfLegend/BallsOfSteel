@@ -74,7 +74,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onInteract(final PlayerInteractEvent event) {
         if (event.hasItem()) {
             if (pli.global_players.containsKey(event.getPlayer().getName())) {
-                // Je r�cupere la classe Iarena pour pouvoir acceder au m�thodes
+                // Je récupere la classe Iarena pour pouvoir acceder au méthodes
                 // persos
                 IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
                 if (event.getItem().getType() == Material.WOOL) {

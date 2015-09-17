@@ -44,7 +44,7 @@ public class ICommandHandler extends CommandHandler {
     @Override
     public boolean saveArena(PluginInstance pli, CommandSender sender, String[] args, String uber_permission,
             String cmd, String action, JavaPlugin plugin, Player p) {
-        // Si le spawn0 de l'ar�ne n'existe pas, alors on le pose
+        // Si le spawn0 de l'aréne n'existe pas, alors on le pose
         FileConfiguration config = MinigamesAPI.getAPI().getPluginInstance(plugin).getArenasConfig().getConfig();
         if (!config.isSet("arenas." + args[1] + ".spawns.spawn0")) {
             config.createSection("arenas." + args[1] + ".spawns.spawn0");

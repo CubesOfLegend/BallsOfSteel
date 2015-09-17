@@ -34,7 +34,7 @@ public class IArena extends Arena {
         pli = api.getPluginInstance(m);
         teams = new ArrayList<Team>();
 
-        // On r�cupere la configuration
+        // On récupere la configuration
         FileConfiguration config = pli.getArenasConfig().getConfig();
         if (config.isSet("arenas." + name + ".spawns.spawn0")) {
             Location loc;
@@ -62,7 +62,7 @@ public class IArena extends Arena {
 
     @Override
     public void joinPlayerLobby(String playername) {
-        // Permet de lancer run() apr�s un certain nombre de ticks serveur
+        // Permet de lancer run() après un certain nombre de ticks serveur
         Bukkit.getScheduler().runTaskLater(this.getPlugin(), new Runnable() {
 
             @Override

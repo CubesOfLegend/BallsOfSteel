@@ -32,7 +32,7 @@ public class TeamSelectorGui {
         int cnt = 0;
         for (Team team : teams) {
             iconm.setOption(cnt, team.getColor().getItemStack(), team.getColor().getChatColor() + team.getName(),
-                    "Choisir l'équipe " + team.getName());
+                    "Choisir l'Ã©quipe " + team.getName());
             cnt++;
         }
 
