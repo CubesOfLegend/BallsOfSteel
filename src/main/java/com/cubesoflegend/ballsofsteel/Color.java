@@ -3,39 +3,39 @@ package com.cubesoflegend.ballsofsteel;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
-public class Color{
-	private String name;
-	private ChatColor chatColor;
-	private ItemStack itemStack;
-	
-	public Color(String name, ItemStack itemStack, ChatColor chatColor){
-		this.name = name;
-		this.chatColor = chatColor;
-		this.itemStack = itemStack;
-	}
+public class Color {
+    private String name;
+    private ChatColor chatColor;
+    private ItemStack itemStack;
 
-	public String getName() {
-		return name;
-	}
+    public Color(String name, ItemStack itemStack, ChatColor chatColor) {
+        this.name = name;
+        this.chatColor = chatColor;
+        this.itemStack = itemStack;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public ChatColor getChatColor() {
-		return chatColor;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setChatColor(ChatColor chatColor) {
-		this.chatColor = chatColor;
-	}
+    public ChatColor getChatColor() {
+        return chatColor;
+    }
 
-	public ItemStack getItemStack() {
-		return itemStack;
-	}
+    public void setChatColor(ChatColor chatColor) {
+        this.chatColor = chatColor;
+    }
 
-	public void setItemStack(ItemStack itemStack) {
-		this.itemStack = itemStack;
-	}
+    public ItemStack getItemStack() {
+        return itemStack;
+    }
+
+    public void setItemStack(ItemStack itemStack) {
+        this.itemStack = itemStack;
+    }
 
 }
