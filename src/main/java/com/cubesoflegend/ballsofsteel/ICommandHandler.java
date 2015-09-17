@@ -1,6 +1,6 @@
 package com.cubesoflegend.ballsofsteel;
 
-import org.apache.commons.lang.ArrayUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -18,14 +18,13 @@ public class ICommandHandler extends CommandHandler {
 	
 	@Override
 	public boolean setSpawn(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd, String action, JavaPlugin plugin, Player p){
-		Bukkit.getLogger().info("Je passe dans ICommandHandler");
 		if (!sender.hasPermission(uber_permission + ".setup")) {
 			sender.sendMessage(pli.getMessagesConfig().no_perm);
 			return true;
 		}
 		if (args.length > 2) {
-			String team = args[2];
-			if (!ArrayUtils.contains(Constants.TeamColors, team)) {
+			String team = args[2].toLowerCase();
+			if (!Constants.colors.containsKey(team)) {
 				sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]" + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> <team>");
 				sender.sendMessage(ChatColor.RED + "Teams possible: Bleu, Rouge, Jaune, Vert, Rose, Violet, Orange, Noir, Blanc");
 				return true;
@@ -44,12 +43,7 @@ public class ICommandHandler extends CommandHandler {
 		//Si le spawn0 de l'arène n'existe pas, alors on le pose
 		FileConfiguration config = MinigamesAPI.getAPI().getPluginInstance(plugin).getArenasConfig().getConfig();
 		if(!config.isSet("arenas." + args[1] + ".spawns.spawn0")){
-			Bukkit.getLogger().info("spawn0 non mis");
 			config.createSection("arenas." + args[1] + ".spawns.spawn0");
-		}
-		else
-		{
-			Bukkit.getLogger().info("spawn0 existant");
 		}
 		if (!sender.hasPermission(uber_permission + ".setup")) {
 			sender.sendMessage(pli.getMessagesConfig().no_perm);
