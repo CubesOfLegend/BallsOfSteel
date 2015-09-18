@@ -20,10 +20,10 @@ import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.config.ArenasConfig;
 import com.comze_instancelabs.minigamesapi.config.ClassesConfig;
 import com.comze_instancelabs.minigamesapi.config.DefaultConfig;
-import com.comze_instancelabs.minigamesapi.config.MessagesConfig;
 import com.comze_instancelabs.minigamesapi.config.StatsConfig;
 import com.comze_instancelabs.minigamesapi.util.Util;
 import com.comze_instancelabs.minigamesapi.util.Validator;
+import com.cubesoflegend.ballsofsteel.config.IMessagesConfig;
 import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
 
 public class Main extends JavaPlugin implements Listener {
@@ -36,7 +36,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onEnable() {
         m = this;
         api = MinigamesAPI.getAPI().setupAPI(this, "BallsOfSteel", IArena.class, new ArenasConfig(this),
-                new MessagesConfig(this), new ClassesConfig(this, false), new StatsConfig(this, false),
+                new IMessagesConfig(this), new ClassesConfig(this, false), new StatsConfig(this, false),
                 new DefaultConfig(this, false), false);
         Bukkit.getPluginManager().registerEvents(this, this);
         pli = MinigamesAPI.getAPI().pinstances.get(this);
@@ -71,21 +71,21 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     @EventHandler
+    //Clic du joueur dans le menu
     public void onInteract(final PlayerInteractEvent event) {
         if (event.hasItem()) {
             if (pli.global_players.containsKey(event.getPlayer().getName())) {
                 // Je récupere la classe Iarena pour pouvoir acceder au méthodes
-                // persos
                 IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
                 if (event.getItem().getType() == Material.WOOL) {
                     if (ia.getArenaState() != ArenaState.INGAME && !ia.isArcadeMain()
                             && !ia.getIngameCountdownStarted()) {
-
                         TeamSelectorGui teamgui = ia.getTeamSelectorGui();
                         teamgui.openGUI(event.getPlayer().getName());
                     }
                 }
             }
         }
+        event.setCancelled(true);
     }
 }

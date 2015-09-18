@@ -1,6 +1,7 @@
 package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -21,7 +22,7 @@ import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
 
 public class IArena extends Arena {
     public Main m;
-    ArrayList<Team> teams;
+    HashMap<String, Team> teams;
     MinigamesAPI api;
     PluginInstance pli;
     ArrayList<Spawn> spawns;
@@ -32,7 +33,7 @@ public class IArena extends Arena {
         this.m = m;
         api = MinigamesAPI.getAPI();
         pli = api.getPluginInstance(m);
-        teams = new ArrayList<Team>();
+        teams = new HashMap<String, Team>();
 
         // On récupere la configuration
         FileConfiguration config = pli.getArenasConfig().getConfig();
@@ -50,8 +51,8 @@ public class IArena extends Arena {
                             spawnConfig.getLong("location.pitch"));
 
                     Spawn spawn = new Spawn(spawnname, loc);
-                    Team team = new Team(Constants.colors.get(spawnname.replace("spawn", "")), spawn);
-                    this.teams.add(team);
+                    Team team = new Team(spawnname.replace("spawn", ""), spawn);
+                    this.teams.put(team.getName(), team);
                 }
             }
             if (!teams.isEmpty()) {
@@ -96,7 +97,7 @@ public class IArena extends Arena {
         return;
     }
 
-    public ArrayList<Team> getTeams() {
+    public HashMap<String, Team> getTeams() {
         return this.teams;
     }
 

@@ -11,6 +11,7 @@ import com.comze_instancelabs.minigamesapi.MinigamesAPI;
 import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.commands.CommandHandler;
 import com.comze_instancelabs.minigamesapi.util.Util;
+import com.cubesoflegend.ballsofsteel.utils.ColorUtils;
 
 public class ICommandHandler extends CommandHandler {
 
@@ -23,7 +24,7 @@ public class ICommandHandler extends CommandHandler {
         }
         if (args.length > 2) {
             String team = args[2].toLowerCase();
-            if (!Constants.colors.containsKey(team)) {
+            if (!ColorUtils.bimapColorChatColor.containsKey(team)) {
                 sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]"
                         + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> <team>");
                 sender.sendMessage(
