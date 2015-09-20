@@ -61,8 +61,8 @@ public class Main extends JavaPlugin implements Listener {
         IArena a = new IArena(m, arena);
         ArenaSetup s = MinigamesAPI.getAPI().pinstances.get(m).arenaSetup;
         a.init(Util.getSignLocationFromArena(m, arena), Util.getAllSpawns(m, arena), Util.getMainLobby(m),
-                Util.getComponentForArena(m, arena, "lobby"), s.getPlayerCount(m, arena, true),
-                s.getPlayerCount(m, arena, false), s.getArenaVIP(m, arena));
+        Util.getComponentForArena(m, arena, "lobby"), s.getPlayerCount(m, arena, true),
+        s.getPlayerCount(m, arena, false), s.getArenaVIP(m, arena));
         return a;
     }
 
@@ -78,8 +78,7 @@ public class Main extends JavaPlugin implements Listener {
                 // Je récupere la classe Iarena pour pouvoir acceder au méthodes
                 IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
                 if (event.getItem().getType() == Material.WOOL) {
-                    if (ia.getArenaState() != ArenaState.INGAME && !ia.isArcadeMain()
-                            && !ia.getIngameCountdownStarted()) {
+                    if (ia.getArenaState() != ArenaState.INGAME && !ia.isArcadeMain() && !ia.getIngameCountdownStarted()) {
                         TeamSelectorGui teamgui = ia.getTeamSelectorGui();
                         teamgui.openGUI(event.getPlayer().getName());
                     }

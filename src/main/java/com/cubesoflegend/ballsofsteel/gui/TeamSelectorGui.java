@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.util.IconMenu;
+import com.cubesoflegend.ballsofsteel.IPlayer;
 import com.cubesoflegend.ballsofsteel.Main;
 import com.cubesoflegend.ballsofsteel.Team;
 import com.cubesoflegend.ballsofsteel.config.IMessagesConfig;
@@ -20,12 +21,12 @@ public class TeamSelectorGui {
     HashMap<String, Team> teams;
     HashMap<Integer, Team> mapOptionTeam;
     public HashMap<String, IconMenu> lasticonm = new HashMap<String, IconMenu>();
+    HashMap<Player, Team> mapPlayerTeam = new HashMap<Player, Team>();
 
     public TeamSelectorGui(PluginInstance pli, Main plugin, HashMap<String ,Team> teams) {
         this.pli = pli;
         this.m = plugin;
         this.teams = teams;
-        
         
     }
 
@@ -40,12 +41,34 @@ public class TeamSelectorGui {
             iconm = new IconMenu("Team", 9, new IconMenu.OptionClickEventHandler() {
                 @Override
                 public void onOptionClick(IconMenu.OptionClickEvent event) {
-                    if(pli.global_players.containsKey(playername)){
-                        Player p = Bukkit.getPlayer(playername);
-                        Team team = mapOptionTeam.get(event.getPosition());
-                        team.addPlayer(p);
-                        IMessagesConfig config = (IMessagesConfig) pli.getMessagesConfig();
-                        p.sendMessage(ChatColor.translateAlternateColorCodes('&', config.you_joined_team.replaceAll("<team>", team.getColoredName())));
+                    //Permet de prendre le joueur qui a cliqué sur le menu et non tout les autres
+                    if(event.getPlayer().getName().equalsIgnoreCase(playername)){
+                        if(pli.global_players.containsKey(playername)){
+                            Player p = Bukkit.getPlayer(playername);
+                            Team team = mapOptionTeam.get(event.getPosition());
+                            //Si le joueur est déjà associé à une équipe
+                            if(mapPlayerTeam.containsKey(p)){
+                                //Et si la nouvelle équipe est différente de l'ancienne
+                                if(mapPlayerTeam.get(p) != team){
+                                    mapPlayerTeam.get(p).removePlayer(p);
+                                    teams.get(team.getName()).addPlayer(p);
+                                    mapPlayerTeam.replace(p, team);
+                                }
+                            }
+                            else
+                            {
+                                teams.get(team.getName()).addPlayer(p);
+                                mapPlayerTeam.put(p, team);
+                            }
+                            /*
+                            for (Map.Entry<String, Team> entry : teams.entrySet()) {
+                                System.err.println("L'équipe" + entry.getValue().getName() + "contient " + entry.getValue().getPlayers().size() + " joueurs : ");
+                                System.err.println(entry.getValue().getPlayers());
+                            }
+                            */
+                            IMessagesConfig config = (IMessagesConfig) pli.getMessagesConfig();
+                            p.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', config.you_joined_team.replaceAll("<team>", team.getCharColoredName())));
+                        }
                     }
                     event.setWillClose(true);
                 }
@@ -55,8 +78,7 @@ public class TeamSelectorGui {
         mapOptionTeam = new HashMap<Integer, Team>();
         for (Map.Entry<String, Team> entry : teams.entrySet()) {
             Team team = entry.getValue();
-            iconm.setOption(cnt, ColorUtils.bimapColorItemStack.get(team.getName()), ColorUtils.bimapColorChatColor.get(team.getName()) + team.getName(),
-                    "Choisir l'équipe " + team.getName());
+            iconm.setOption(cnt, ColorUtils.bimapColorItemStack.get(team.getName()), team.getChatColoredName(), "Choisir l'équipe " + team.getChatColoredName());
             mapOptionTeam.put(cnt, team);
             cnt++;
         }
