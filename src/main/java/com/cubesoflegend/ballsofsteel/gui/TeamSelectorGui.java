@@ -60,16 +60,12 @@ public class TeamSelectorGui {
                                 teams.get(team.getName()).addPlayer(p);
                                 mapPlayerTeam.put(p, team);
                             }
-                            /*
-                            for (Map.Entry<String, Team> entry : teams.entrySet()) {
-                                System.err.println("L'équipe" + entry.getValue().getName() + "contient " + entry.getValue().getPlayers().size() + " joueurs : ");
-                                System.err.println(entry.getValue().getPlayers());
-                            }
-                            */
                             IMessagesConfig config = (IMessagesConfig) pli.getMessagesConfig();
                             p.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', config.you_joined_team.replaceAll("<team>", team.getCharColoredName())));
                         }
+                        
                     }
+                    
                     event.setWillClose(true);
                 }
             }, m);

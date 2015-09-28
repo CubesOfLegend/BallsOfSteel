@@ -2,6 +2,7 @@ package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -91,14 +92,24 @@ public class IArena extends Arena {
 
     @Override
     public void start(boolean tp) {
+        //On renvoie toutes les teams à leur spawns respectifs
+        for (Map.Entry<String, Team> entry : teams.entrySet()) {
+            Team team = entry.getValue();
+            team.teleportTeam(team.getSpawn().location);
+        }
+        /*
         ArrayList<Location> spawns = this.getSpawns();
         ArrayList<String> players = this.getAllPlayers();
         Bukkit.getLogger().info("getAllplayer renvoie : " + players.size());
+        */
         return;
     }
-
-    public HashMap<String, Team> getTeams() {
-        return this.teams;
+    
+    public void initializeTeams(HashMap<Player, Team> mapPlayerTeam){
+        for (Map.Entry<Player, Team> entry : mapPlayerTeam.entrySet()) {
+            String team_name = entry.getValue().getName();
+            teams.get(team_name).addPlayer(entry.getKey());;
+        }
     }
 
     public TeamSelectorGui getTeamSelectorGui() {

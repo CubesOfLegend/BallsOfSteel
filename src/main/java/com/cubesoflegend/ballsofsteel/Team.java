@@ -3,6 +3,7 @@ package com.cubesoflegend.ballsofsteel;
 import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.cubesoflegend.ballsofsteel.utils.ColorUtils;
@@ -62,6 +63,12 @@ public class Team {
 
     public void setSpawn(Spawn spawn) {
         this.spawn = spawn;
+    }
+    
+    public void teleportTeam(Location location){
+        for (Player player : players) {
+            player.teleport(location);
+        }
     }
 
 }
