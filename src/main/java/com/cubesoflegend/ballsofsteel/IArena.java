@@ -35,7 +35,9 @@ public class IArena extends Arena {
         api = MinigamesAPI.getAPI();
         pli = api.getPluginInstance(m);
         teams = new HashMap<String, Team>();
-
+        
+        
+        System.err.println("Constructeur Arena");
         // On récupere la configuration
         FileConfiguration config = pli.getArenasConfig().getConfig();
         if (config.isSet("arenas." + name + ".spawns.spawn0")) {
@@ -95,6 +97,7 @@ public class IArena extends Arena {
         //On renvoie toutes les teams à leur spawns respectifs
         for (Map.Entry<String, Team> entry : teams.entrySet()) {
             Team team = entry.getValue();
+            System.err.println("Teleport team "+ team.getName() + " tp spawn "+ team.getSpawn().name +"("+team.getSpawn().location+")");
             team.teleportTeam(team.getSpawn().location);
         }
         /*
@@ -105,11 +108,24 @@ public class IArena extends Arena {
         return;
     }
     
-    public void initializeTeams(HashMap<Player, Team> mapPlayerTeam){
-        for (Map.Entry<Player, Team> entry : mapPlayerTeam.entrySet()) {
-            String team_name = entry.getValue().getName();
-            teams.get(team_name).addPlayer(entry.getKey());;
+    public void changePlayerToTeam(Player player, Team team){
+        for (Map.Entry<String, Team> entry : teams.entrySet()) {
+            if(entry.getValue().getPlayers().contains(player)){
+                entry.getValue().getPlayers().remove(player);
+            }
         }
+        teams.get(team.getName()).addPlayer(player);
+        /*debug
+        for (Map.Entry<String, Team> entry : teams.entrySet()) {
+            System.out.println("Team " +entry.getKey() + ": ");
+            for (Player p  : entry.getValue().getPlayers()) {
+                System.out.println(p.getName());
+            }
+        }
+        end debug*/
+    }
+    public HashMap<String, Team> getTeams(){
+        return this.teams;
     }
 
     public TeamSelectorGui getTeamSelectorGui() {

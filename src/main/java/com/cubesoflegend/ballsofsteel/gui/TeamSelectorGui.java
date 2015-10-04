@@ -3,12 +3,14 @@ package com.cubesoflegend.ballsofsteel.gui;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.util.IconMenu;
+import com.cubesoflegend.ballsofsteel.IArena;
 import com.cubesoflegend.ballsofsteel.IPlayer;
 import com.cubesoflegend.ballsofsteel.Main;
 import com.cubesoflegend.ballsofsteel.Team;
@@ -17,7 +19,7 @@ import com.cubesoflegend.ballsofsteel.utils.ColorUtils;
 
 public class TeamSelectorGui {
     PluginInstance pli;
-    Main m;
+    Main plugin;
     HashMap<String, Team> teams;
     HashMap<Integer, Team> mapOptionTeam;
     public HashMap<String, IconMenu> lasticonm = new HashMap<String, IconMenu>();
@@ -25,7 +27,7 @@ public class TeamSelectorGui {
 
     public TeamSelectorGui(PluginInstance pli, Main plugin, HashMap<String ,Team> teams) {
         this.pli = pli;
-        this.m = plugin;
+        this.plugin = plugin;
         this.teams = teams;
         
     }
@@ -45,30 +47,19 @@ public class TeamSelectorGui {
                     if(event.getPlayer().getName().equalsIgnoreCase(playername)){
                         if(pli.global_players.containsKey(playername)){
                             Player p = Bukkit.getPlayer(playername);
+                            //global_players contient en fait un hashmap <playername,arena> :o
+                            IArena a = (IArena) pli.global_players.get(playername);
                             Team team = mapOptionTeam.get(event.getPosition());
-                            //Si le joueur est déjà associé à une équipe
-                            if(mapPlayerTeam.containsKey(p)){
-                                //Et si la nouvelle équipe est différente de l'ancienne
-                                if(mapPlayerTeam.get(p) != team){
-                                    mapPlayerTeam.get(p).removePlayer(p);
-                                    teams.get(team.getName()).addPlayer(p);
-                                    mapPlayerTeam.replace(p, team);
-                                }
-                            }
-                            else
-                            {
-                                teams.get(team.getName()).addPlayer(p);
-                                mapPlayerTeam.put(p, team);
-                            }
+                            a.changePlayerToTeam(p, team);
                             IMessagesConfig config = (IMessagesConfig) pli.getMessagesConfig();
                             p.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', config.you_joined_team.replaceAll("<team>", team.getCharColoredName())));
+                            plugin.scoreboard.updateScoreboard(a);
                         }
-                        
                     }
                     
                     event.setWillClose(true);
                 }
-            }, m);
+            }, plugin);
         }
         int cnt = 0;
         mapOptionTeam = new HashMap<Integer, Team>();

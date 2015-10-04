@@ -31,6 +31,7 @@ public class Main extends JavaPlugin implements Listener {
     MinigamesAPI api = null;
     PluginInstance pli = null;
     ICommandHandler cmdhandler = new ICommandHandler();
+    public IArenaScoreBoard scoreboard = new IArenaScoreBoard(this);
     static Main m = null;
 
     public void onEnable() {
@@ -38,9 +39,11 @@ public class Main extends JavaPlugin implements Listener {
         api = MinigamesAPI.getAPI().setupAPI(this, "BallsOfSteel", IArena.class, new ArenasConfig(this),
                 new IMessagesConfig(this), new ClassesConfig(this, false), new StatsConfig(this, false),
                 new DefaultConfig(this, false), false);
+        PluginInstance pinstance = api.pinstances.get(this);
+        pinstance.addLoadedArenas(loadArenas(this, pinstance.getArenasConfig()));
         Bukkit.getPluginManager().registerEvents(this, this);
-        pli = MinigamesAPI.getAPI().pinstances.get(this);
-        pli.addLoadedArenas(loadArenas(this, pli.getArenasConfig()));
+        pinstance.scoreboardManager = new IArenaScoreBoard(this);
+        pli = pinstance;
     }
 
     public static ArrayList<Arena> loadArenas(JavaPlugin plugin, ArenasConfig cf) {
