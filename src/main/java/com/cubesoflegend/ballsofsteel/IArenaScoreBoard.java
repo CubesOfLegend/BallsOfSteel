@@ -28,7 +28,6 @@ public class IArenaScoreBoard extends ArenaScoreboard {
     }
 
     public void updateScoreboard(final IArena arena) {
-        System.out.println("++ updateScoreBoard");
         HashMap<String, Team> teams = arena.getTeams();
         
         if (!ascore.containsKey(arena.getName())) {
@@ -46,17 +45,14 @@ public class IArenaScoreBoard extends ArenaScoreboard {
         //On parcours les teams de l'arene
         for(Map.Entry<String, Team> m_str_team : teams.entrySet()){
             Team team = m_str_team.getValue();
-            System.out.println("++++ getting Team : " + team.getName());
             
             aobjective.get(arena.getName()).getScore(Bukkit.getOfflinePlayer(team.getChatColoredName())).setScore(team.getPlayers().size());
             
             //On parcours les players de la team
             for(String playername : arena.getAllPlayers()){
                 Player player = Bukkit.getPlayer(playername);
-                System.out.println("++++++ getting Player : " + player.getName());
                 
                 //ascore.get(arena.getName()).resetScores(Bukkit.getOfflinePlayer(player.getName()));
-                System.out.println("++++++++ setting ScoreBoard for player : " + player.getName());
                 player.setScoreboard(ascore.get(arena.getName()));
             }
         }
@@ -86,8 +82,8 @@ public class IArenaScoreBoard extends ArenaScoreboard {
 
     @Override
     public void updateScoreboard(JavaPlugin plugin, final Arena arena) {
-        IArena a = (IArena) MinigamesAPI.getAPI().pinstances.get(plugin).getArenaByName(arena.getName());
-        this.updateScoreboard(a);
+        //IArena a = (IArena) MinigamesAPI.getAPI().pinstances.get(plugin).getArenaByName(arena.getName());
+        //this.updateScoreboard(a);
     }
 
     @Override

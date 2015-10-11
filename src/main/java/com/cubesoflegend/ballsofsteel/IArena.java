@@ -76,7 +76,7 @@ public class IArena extends Arena {
                         ItemMeta itemm = teamselector.getItemMeta();
                         itemm.setDisplayName(ChatColor.RED + "Team");
                         teamselector.setItemMeta(itemm);
-                        p.getInventory().setItem(0, teamselector);
+                        p.getInventory().setItem(2, teamselector);
                         p.updateInventory();
                     }
                 }
@@ -99,6 +99,7 @@ public class IArena extends Arena {
             Team team = entry.getValue();
             team.teleportTeam(team.getSpawn().location);
         }
+        super.start(false);
         return;
     }
     
