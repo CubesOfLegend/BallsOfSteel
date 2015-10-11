@@ -31,14 +31,14 @@ public class Team {
      * Récupere le nom de la team, passe la premiére lettre en majuscule, entoure le tout des balises de ChatColor et renvoie le résultat
      * @return String
      */
-    public String getCharColoredName(){
+    public String getChatColoredName(){
         Character c = ColorUtils.bimapColorChatColor.get(this.name).getChar();
-        return  "&"+ c + Character.toUpperCase(this.name.charAt(0))+this.name.substring(1) + "&"+ c;
+        String str = "&"+ c + Character.toUpperCase(this.name.charAt(0))+this.name.substring(1) + "&"+ c;
+        return ChatColor.translateAlternateColorCodes('&', str);
     }
     
-    public String getChatColoredName(){
-        String s = Character.toUpperCase(this.name.charAt(0))+this.name.substring(1);
-        return ColorUtils.bimapColorChatColor.get(this.name) + s;
+    public ChatColor getChatColor(){
+        return ColorUtils.bimapColorChatColor.get(this.name);
     }
     
     /**

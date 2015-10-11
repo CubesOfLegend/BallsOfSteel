@@ -36,8 +36,6 @@ public class IArena extends Arena {
         pli = api.getPluginInstance(m);
         teams = new HashMap<String, Team>();
         
-        
-        System.err.println("Constructeur Arena");
         // On récupere la configuration
         FileConfiguration config = pli.getArenasConfig().getConfig();
         if (config.isSet("arenas." + name + ".spawns.spawn0")) {
@@ -85,10 +83,12 @@ public class IArena extends Arena {
             }
         }, 25L);
         super.joinPlayerLobby(playername);
+        m.lobbyScoreBoard.updateScoreboard(m, this);
     }
 
     @Override
     public void leavePlayer(String playername, boolean fullLeave) {
+        m.scoreboard.removeScoreboard(this.getName(), Bukkit.getPlayer(playername));
         super.leavePlayer(playername, fullLeave);
     }
 
@@ -97,14 +97,8 @@ public class IArena extends Arena {
         //On renvoie toutes les teams à leur spawns respectifs
         for (Map.Entry<String, Team> entry : teams.entrySet()) {
             Team team = entry.getValue();
-            System.err.println("Teleport team "+ team.getName() + " tp spawn "+ team.getSpawn().name +"("+team.getSpawn().location+")");
             team.teleportTeam(team.getSpawn().location);
         }
-        /*
-        ArrayList<Location> spawns = this.getSpawns();
-        ArrayList<String> players = this.getAllPlayers();
-        Bukkit.getLogger().info("getAllplayer renvoie : " + players.size());
-        */
         return;
     }
     
@@ -115,6 +109,7 @@ public class IArena extends Arena {
             }
         }
         teams.get(team.getName()).addPlayer(player);
+        m.lobbyScoreBoard.updateScoreboard(m, this);
         /*debug
         for (Map.Entry<String, Team> entry : teams.entrySet()) {
             System.out.println("Team " +entry.getKey() + ": ");

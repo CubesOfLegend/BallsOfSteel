@@ -3,7 +3,6 @@ package com.cubesoflegend.ballsofsteel.gui;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -11,7 +10,6 @@ import org.bukkit.entity.Player;
 import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.util.IconMenu;
 import com.cubesoflegend.ballsofsteel.IArena;
-import com.cubesoflegend.ballsofsteel.IPlayer;
 import com.cubesoflegend.ballsofsteel.Main;
 import com.cubesoflegend.ballsofsteel.Team;
 import com.cubesoflegend.ballsofsteel.config.IMessagesConfig;
@@ -52,8 +50,7 @@ public class TeamSelectorGui {
                             Team team = mapOptionTeam.get(event.getPosition());
                             a.changePlayerToTeam(p, team);
                             IMessagesConfig config = (IMessagesConfig) pli.getMessagesConfig();
-                            p.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', config.you_joined_team.replaceAll("<team>", team.getCharColoredName())));
-                            plugin.scoreboard.updateScoreboard(a);
+                            p.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', config.you_joined_team.replaceAll("<team>", team.getChatColoredName())));
                         }
                     }
                     

@@ -31,7 +31,8 @@ public class Main extends JavaPlugin implements Listener {
     MinigamesAPI api = null;
     PluginInstance pli = null;
     ICommandHandler cmdhandler = new ICommandHandler();
-    public IArenaScoreBoard scoreboard = new IArenaScoreBoard(this);
+    public IArenaScoreBoard scoreboard;
+    public IArenaLobbyScoreBoard lobbyScoreBoard;
     static Main m = null;
 
     public void onEnable() {
@@ -42,7 +43,10 @@ public class Main extends JavaPlugin implements Listener {
         PluginInstance pinstance = api.pinstances.get(this);
         pinstance.addLoadedArenas(loadArenas(this, pinstance.getArenasConfig()));
         Bukkit.getPluginManager().registerEvents(this, this);
-        pinstance.scoreboardManager = new IArenaScoreBoard(this);
+        scoreboard = new IArenaScoreBoard(this);
+        lobbyScoreBoard = new IArenaLobbyScoreBoard(pinstance, this);
+        pinstance.scoreboardLobbyManager = lobbyScoreBoard;
+        pinstance.scoreboardManager = scoreboard;
         pli = pinstance;
     }
 

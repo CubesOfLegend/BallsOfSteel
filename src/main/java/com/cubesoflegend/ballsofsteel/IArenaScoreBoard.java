@@ -19,6 +19,7 @@ import com.comze_instancelabs.minigamesapi.util.ArenaScoreboard;
 public class IArenaScoreBoard extends ArenaScoreboard {
     HashMap<String, Scoreboard> ascore = new HashMap<String, Scoreboard>();
     HashMap<String, Objective> aobjective = new HashMap<String, Objective>();
+    HashMap<String, Team> ateam = new HashMap<String, Team>();
 
     JavaPlugin plugin = null;
 
@@ -27,23 +28,35 @@ public class IArenaScoreBoard extends ArenaScoreboard {
     }
 
     public void updateScoreboard(final IArena arena) {
+        System.out.println("++ updateScoreBoard");
         HashMap<String, Team> teams = arena.getTeams();
+        
+        if (!ascore.containsKey(arena.getName())) {
+            ascore.put(arena.getName(), Bukkit.getScoreboardManager().getNewScoreboard());
+        }
+        if (!aobjective.containsKey(arena.getName())) {
+            aobjective.put(arena.getName(), ascore.get(arena.getName()).registerNewObjective(arena.getName(), "dummy"));
+        }
+        
+        ateam = arena.getTeams();
+        
+        aobjective.get(arena.getName()).setDisplaySlot(DisplaySlot.SIDEBAR);
+        aobjective.get(arena.getName()).setDisplayName("Teams");
+        
         //On parcours les teams de l'arene
         for(Map.Entry<String, Team> m_str_team : teams.entrySet()){
             Team team = m_str_team.getValue();
+            System.out.println("++++ getting Team : " + team.getName());
+            
+            aobjective.get(arena.getName()).getScore(Bukkit.getOfflinePlayer(team.getChatColoredName())).setScore(team.getPlayers().size());
+            
             //On parcours les players de la team
-            for(Player player : team.getPlayers()){
-                if (!ascore.containsKey(arena.getName())) {
-                    ascore.put(arena.getName(), Bukkit.getScoreboardManager().getNewScoreboard());
-                }
-                if (!aobjective.containsKey(arena.getName())) {
-                    aobjective.put(arena.getName(), ascore.get(arena.getName()).registerNewObjective(arena.getName(), "dummy"));
-                }
-                aobjective.get(arena.getName()).setDisplaySlot(DisplaySlot.SIDEBAR);
-                aobjective.get(arena.getName()).setDisplayName(MinigamesAPI.getAPI().pinstances.get(plugin).getMessagesConfig().scoreboard_title.replaceAll("<arena>", arena.getName()));
+            for(String playername : arena.getAllPlayers()){
+                Player player = Bukkit.getPlayer(playername);
+                System.out.println("++++++ getting Player : " + player.getName());
                 
-                ascore.get(arena.getName()).getScores(team.getChatColoredName() + player.getName());
-                
+                //ascore.get(arena.getName()).resetScores(Bukkit.getOfflinePlayer(player.getName()));
+                System.out.println("++++++++ setting ScoreBoard for player : " + player.getName());
                 player.setScoreboard(ascore.get(arena.getName()));
             }
         }
