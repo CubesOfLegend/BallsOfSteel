@@ -7,9 +7,12 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.comze_instancelabs.minigamesapi.Arena;
@@ -78,13 +81,40 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     @EventHandler
+    public void onBreak(BlockBreakEvent event){
+        if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
+            IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
+            if(a.getArenaState() == ArenaState.INGAME){
+                
+            }
+            else
+            {
+                event.setCancelled(true);
+            }
+        }
+    }
+    
+    @EventHandler
+    public void onPlayerPickup(PlayerPickupItemEvent event){
+        Player player = event.getPlayer();
+        if(pli.containsGlobalPlayer(player.getName()) && !pli.containsGlobalLost(player.getName())){
+            IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
+            if(a.getArenaState() == ArenaState.INGAME){
+                System.out.println("Player " + player.getName() + "has pick up " + event.getItem().getItemStack().getAmount() + event.getItem().getItemStack().getType().toString());
+            }
+        }
+        event.getPlayer().getName();
+    }
+    
+    @EventHandler
     //Clic du joueur dans le menu
     public void onInteract(final PlayerInteractEvent event) {
         if (event.hasItem()) {
             if (pli.global_players.containsKey(event.getPlayer().getName())) {
-                // Je récupere la classe Iarena pour pouvoir acceder au méthodes
+                //On récupére l'IArena dans laquelle se trouve le joueur
                 IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
                 if (event.getItem().getType() == Material.WOOL) {
+                    //Si l'arene est en jeu && 
                     if (ia.getArenaState() != ArenaState.INGAME && !ia.isArcadeMain() && !ia.getIngameCountdownStarted()) {
                         TeamSelectorGui teamgui = ia.getTeamSelectorGui();
                         teamgui.openGUI(event.getPlayer().getName());
@@ -92,6 +122,8 @@ public class Main extends JavaPlugin implements Listener {
                 }
             }
         }
-        event.setCancelled(true);
     }
+    
+    
+    
 }

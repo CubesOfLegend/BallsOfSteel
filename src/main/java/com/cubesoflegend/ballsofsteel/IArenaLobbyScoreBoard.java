@@ -2,7 +2,6 @@ package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -57,11 +56,9 @@ public class IArenaLobbyScoreBoard extends ArenaLobbyScoreboard {
                         aobjective.get(p__).setDisplaySlot(DisplaySlot.SIDEBAR);
                         aobjective.get(p__).setDisplayName("Teams of : " + pli.getMessagesConfig().scoreboard_lobby_title.replaceAll("<arena>", arena.getInternalName()));
                     }
-                    for (Map.Entry<String, Team> map_str_team : arena.getTeams().entrySet()) {
-                        Team team = map_str_team.getValue();
+                    for (Team team : arena.getTeams()) {
                         aobjective.get(p__).getScore(Bukkit.getOfflinePlayer(team.getChatColoredName())).setScore(team.getPlayers().size());;;                    }
                         p.setScoreboard(ascore.get(p__));
-                    
                 }
             }
         });

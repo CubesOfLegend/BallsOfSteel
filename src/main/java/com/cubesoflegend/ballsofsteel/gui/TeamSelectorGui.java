@@ -1,5 +1,6 @@
 package com.cubesoflegend.ballsofsteel.gui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,11 +24,13 @@ public class TeamSelectorGui {
     public HashMap<String, IconMenu> lasticonm = new HashMap<String, IconMenu>();
     HashMap<Player, Team> mapPlayerTeam = new HashMap<Player, Team>();
 
-    public TeamSelectorGui(PluginInstance pli, Main plugin, HashMap<String ,Team> teams) {
+    public TeamSelectorGui(PluginInstance pli, Main plugin, ArrayList<Team> teams) {
         this.pli = pli;
         this.plugin = plugin;
-        this.teams = teams;
-        
+        this.teams = new HashMap<String, Team>();
+        for (Team team : teams) {
+            this.teams.put(team.getName(), team);
+        }
     }
 
     public void openGUI(String playername) {
@@ -53,7 +56,6 @@ public class TeamSelectorGui {
                             p.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', config.you_joined_team.replaceAll("<team>", team.getChatColoredName())));
                         }
                     }
-                    
                     event.setWillClose(true);
                 }
             }, plugin);

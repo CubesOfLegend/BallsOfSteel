@@ -32,7 +32,6 @@ public class ICommandHandler extends CommandHandler {
                         ChatColor.RED + "Teams possible: Bleu, Rouge, Jaune, Vert, Rose, Violet, Orange, Noir, Blanc");
                 return true;
             }
-            // pli.arenaSetup.autoSetSpawn(plugin, args[1], p.getLocation());
             Util.saveComponentForArena(plugin, args[1], "spawns.spawn" + team.toLowerCase(), p.getLocation());
             sender.sendMessage(
                     pli.getMessagesConfig().successfully_set.replaceAll("<component>", "spawn for team " + team));
@@ -45,7 +44,7 @@ public class ICommandHandler extends CommandHandler {
 
     @Override
     public boolean saveArena(PluginInstance pli, CommandSender sender, String[] args, String uber_permission,
-            String cmd, String action, JavaPlugin plugin, Player p) {
+        String cmd, String action, JavaPlugin plugin, Player p) {
         // Si le spawn0 de l'aréne n'existe pas, alors on le pose
         FileConfiguration config = MinigamesAPI.getAPI().getPluginInstance(plugin).getArenasConfig().getConfig();
         if (!config.isSet("arenas." + args[1] + ".spawns.spawn0")) {

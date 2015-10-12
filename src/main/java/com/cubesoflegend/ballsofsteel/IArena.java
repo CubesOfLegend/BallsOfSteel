@@ -23,10 +23,14 @@ import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
 
 public class IArena extends Arena {
     public Main m;
-    HashMap<String, Team> teams;
+    //Liste des teams et de leur joueurs
+    ArrayList<Team> teams;
     MinigamesAPI api;
     PluginInstance pli;
+    //Liste des spawns de l'arène
     ArrayList<Spawn> spawns;
+    //Liste des joueurs participants (Présents au lancement de la partie)
+    HashMap<Player, IPlayer> players;
     private TeamSelectorGui teamgui;
 
     public IArena(Main m, String name) {
@@ -34,7 +38,8 @@ public class IArena extends Arena {
         this.m = m;
         api = MinigamesAPI.getAPI();
         pli = api.getPluginInstance(m);
-        teams = new HashMap<String, Team>();
+        players = new HashMap<Player, IPlayer>();
+        teams = new ArrayList<Team>();
         
         // On récupere la configuration
         FileConfiguration config = pli.getArenasConfig().getConfig();
@@ -53,7 +58,7 @@ public class IArena extends Arena {
 
                     Spawn spawn = new Spawn(spawnname, loc);
                     Team team = new Team(spawnname.replace("spawn", ""), spawn);
-                    this.teams.put(team.getName(), team);
+                    teams.add(team);
                 }
             }
             if (!teams.isEmpty()) {
@@ -70,6 +75,8 @@ public class IArena extends Arena {
             @Override
             public void run() {
                 Player p = Bukkit.getPlayer(playername);
+                IPlayer ip = new IPlayer(p);
+                players.put(p, ip);
                 if (p != null) {
                     if (m.pli.global_players.containsKey(p.getName())) {
                         ItemStack teamselector = new ItemStack(Material.WOOL, 1, (byte) 14);
@@ -88,43 +95,58 @@ public class IArena extends Arena {
 
     @Override
     public void leavePlayer(String playername, boolean fullLeave) {
-        m.scoreboard.removeScoreboard(this.getName(), Bukkit.getPlayer(playername));
+        IPlayer ip = players.get(Bukkit.getPlayer(playername));
+        m.scoreboard.removeScoreboard(this.getName(), ip.getPlayer());
+        players.remove(ip.getPlayer());
+        //Si il est associé à une équipe
+        if(ip.getTeam() != null){
+            //On le vire de son équipe
+            ip.getTeam().removePlayer(ip);
+        }
         super.leavePlayer(playername, fullLeave);
     }
 
     @Override
     public void start(boolean tp) {
         //On renvoie toutes les teams à leur spawns respectifs
-        for (Map.Entry<String, Team> entry : teams.entrySet()) {
-            Team team = entry.getValue();
+        for (Team team : teams) {
             team.teleportTeam(team.getSpawn().location);
         }
         super.start(false);
         return;
     }
     
-    public void changePlayerToTeam(Player player, Team team){
-        for (Map.Entry<String, Team> entry : teams.entrySet()) {
-            if(entry.getValue().getPlayers().contains(player)){
-                entry.getValue().getPlayers().remove(player);
-            }
+    public void changePlayerToTeam(Player p, Team team){
+        IPlayer player = players.get(p);
+        //Si il a une team on le supprime de sa team
+        if(player.getTeam() != null){
+            teams.get(teams.indexOf(player.getTeam())).removePlayer(player);
         }
-        teams.get(team.getName()).addPlayer(player);
+        teams.get(teams.indexOf(team)).addPlayer(player);
+        players.get(p).setTeam(team);
+        verboseArenaData();
         m.lobbyScoreBoard.updateScoreboard(m, this);
-        /*debug
-        for (Map.Entry<String, Team> entry : teams.entrySet()) {
-            System.out.println("Team " +entry.getKey() + ": ");
-            for (Player p  : entry.getValue().getPlayers()) {
-                System.out.println(p.getName());
-            }
-        }
-        end debug*/
     }
-    public HashMap<String, Team> getTeams(){
+    public ArrayList<Team> getTeams(){
         return this.teams;
     }
 
     public TeamSelectorGui getTeamSelectorGui() {
         return this.teamgui;
+    }
+    
+    public void verboseArenaData(){
+        System.out.println(" Printing players ...");
+        for (Map.Entry<Player, IPlayer> m_p_ip : players.entrySet()) {
+            System.out.println(" - - Player : " + m_p_ip.getValue().getPlayer().getName() + " => " + m_p_ip.getValue().getTeam().getName());
+        }
+        
+        System.out.println(" Printing teams ...");
+        for (Team team : teams) {
+            System.out.println(" - - Team " + team.getName() + "(" + team.getPlayers().size() +")");
+            for (IPlayer player : team.getPlayers()) {
+                System.out.println(" - - - - " + player.getPlayer().getName());
+            }
+        }
     }
 }

@@ -1,10 +1,9 @@
 package com.cubesoflegend.ballsofsteel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -13,13 +12,11 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
 import com.comze_instancelabs.minigamesapi.Arena;
-import com.comze_instancelabs.minigamesapi.MinigamesAPI;
 import com.comze_instancelabs.minigamesapi.util.ArenaScoreboard;
 
 public class IArenaScoreBoard extends ArenaScoreboard {
     HashMap<String, Scoreboard> ascore = new HashMap<String, Scoreboard>();
     HashMap<String, Objective> aobjective = new HashMap<String, Objective>();
-    HashMap<String, Team> ateam = new HashMap<String, Team>();
 
     JavaPlugin plugin = null;
 
@@ -28,7 +25,7 @@ public class IArenaScoreBoard extends ArenaScoreboard {
     }
 
     public void updateScoreboard(final IArena arena) {
-        HashMap<String, Team> teams = arena.getTeams();
+        ArrayList<Team> teams = arena.getTeams();
         
         if (!ascore.containsKey(arena.getName())) {
             ascore.put(arena.getName(), Bukkit.getScoreboardManager().getNewScoreboard());
@@ -37,14 +34,12 @@ public class IArenaScoreBoard extends ArenaScoreboard {
             aobjective.put(arena.getName(), ascore.get(arena.getName()).registerNewObjective(arena.getName(), "dummy"));
         }
         
-        ateam = arena.getTeams();
         
         aobjective.get(arena.getName()).setDisplaySlot(DisplaySlot.SIDEBAR);
         aobjective.get(arena.getName()).setDisplayName("Teams");
         
         //On parcours les teams de l'arene
-        for(Map.Entry<String, Team> m_str_team : teams.entrySet()){
-            Team team = m_str_team.getValue();
+        for(Team team : teams){
             
             aobjective.get(arena.getName()).getScore(Bukkit.getOfflinePlayer(team.getChatColoredName())).setScore(team.getPlayers().size());
             

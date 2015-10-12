@@ -4,22 +4,21 @@ import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 import com.cubesoflegend.ballsofsteel.utils.ColorUtils;
 
 public class Team {
-    private ArrayList<Player> players;
+    private ArrayList<IPlayer> players;
     private String name;
     private Spawn spawn;
 
     public Team(String name, Spawn spawn) {
-        this.players = new ArrayList<Player>();
+        this.players = new ArrayList<IPlayer>();
         this.name = name;
         this.spawn = spawn;
     }
 
-    public ArrayList<Player> getPlayers() {
+    public ArrayList<IPlayer> getPlayers() {
         return players;
     }
 
@@ -45,15 +44,15 @@ public class Team {
      * Renvoie la liste des joueurs
      * @param players
      */
-    public void setPlayers(ArrayList<Player> players) {
+    public void setPlayers(ArrayList<IPlayer> players) {
         this.players = players;
     }
 
-    public void addPlayer(Player player) {
+    public void addPlayer(IPlayer player) {
         this.players.add(player);
     }
 
-    public void removePlayer(Player player) {
+    public void removePlayer(IPlayer player) {
         this.players.remove(player);
     }
 
@@ -66,8 +65,8 @@ public class Team {
     }
     
     public void teleportTeam(Location location){
-        for (Player player : players) {
-            player.teleport(location);
+        for (IPlayer player : players) {
+            player.getPlayer().teleport(location);
         }
     }
 
