@@ -3,13 +3,25 @@ package com.cubesoflegend.ballsofsteel;
 import org.bukkit.entity.Player;
 
 public class IPlayer{
-    Player player;
-    Team team;
     
+    private Player player;
+    private Team team;
+    
+    private Integer diamondsMined;
+
     public IPlayer(Player p){
         this.player = p;
+        this.diamondsMined = 0;
     }
     
+    public Integer getDiamondsMined() {
+        return diamondsMined;
+    }
+
+    public void setDiamondsMined(Integer diamondsMined) {
+        this.diamondsMined = diamondsMined;
+    }
+
     public void setTeam(Team t){
         this.team = t;
     }

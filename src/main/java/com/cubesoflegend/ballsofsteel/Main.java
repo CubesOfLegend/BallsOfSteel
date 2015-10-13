@@ -1,18 +1,21 @@
 package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.comze_instancelabs.minigamesapi.Arena;
@@ -80,31 +83,26 @@ public class Main extends JavaPlugin implements Listener {
         return cmdhandler.handleArgs(this, "bos", "/" + cmd.getName(), sender, args);
     }
 
+    /*
     @EventHandler
     public void onBreak(BlockBreakEvent event){
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
             IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
-            if(a.getArenaState() == ArenaState.INGAME){
-                
-            }
-            else
-            {
-                event.setCancelled(true);
+            IPlayer ip = a.getPlayers().get(event.getPlayer());
+            if(a.getArenaState() == ArenaState.INGAME && event.getBlock().getType() == Material.DIAMOND_ORE){
+                Collection<ItemStack> drops = event.getBlock().getDrops();
+                for (ItemStack itemStack : drops) {
+                    if(itemStack.getType() == Material.DIAMOND){
+                        ip.setDiamondsMined(ip.getDiamondsMined() + itemStack.getAmount());
+                        //Get amount envoie toujours 1...
+                        System.out.println(event.getPlayer().getName() + " has break diamond ore which drops " + itemStack.getAmount());
+                        System.out.println(event.getPlayer().getName() + " has " + ip.getDiamondsMined() + " diamonds");
+                    }
+                }
             }
         }
     }
-    
-    @EventHandler
-    public void onPlayerPickup(PlayerPickupItemEvent event){
-        Player player = event.getPlayer();
-        if(pli.containsGlobalPlayer(player.getName()) && !pli.containsGlobalLost(player.getName())){
-            IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
-            if(a.getArenaState() == ArenaState.INGAME){
-                System.out.println("Player " + player.getName() + "has pick up " + event.getItem().getItemStack().getAmount() + event.getItem().getItemStack().getType().toString());
-            }
-        }
-        event.getPlayer().getName();
-    }
+    */
     
     @EventHandler
     //Clic du joueur dans le menu

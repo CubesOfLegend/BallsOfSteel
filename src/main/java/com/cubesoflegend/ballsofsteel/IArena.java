@@ -23,16 +23,18 @@ import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
 
 public class IArena extends Arena {
     public Main m;
-    //Liste des teams et de leur joueurs
     ArrayList<Team> teams;
     MinigamesAPI api;
     PluginInstance pli;
-    //Liste des spawns de l'arène
     ArrayList<Spawn> spawns;
-    //Liste des joueurs participants (Présents au lancement de la partie)
     HashMap<Player, IPlayer> players;
     private TeamSelectorGui teamgui;
 
+    /**
+     * Constructor IArena
+     * @param Main m
+     * @param String name
+     */
     public IArena(Main m, String name) {
         super(m, name);
         this.m = m;
@@ -67,6 +69,32 @@ public class IArena extends Arena {
         }
     }
 
+    //Getters
+    /**
+     * Return teams
+     * @return ArrayList<Team>
+     */
+    public ArrayList<Team> getTeams(){
+        return this.teams;
+    }
+    
+    /**
+     * Return players
+     * @return HashMap<Player, IPlayer>
+     */
+    public HashMap<Player, IPlayer> getPlayers(){
+        return this.players;
+    }
+    
+    /**
+     * Return arena associated TeamSelectorGUI 
+     * @return TeamSelectorGUI
+     */
+    public TeamSelectorGui getTeamSelectorGui() {
+        return this.teamgui;
+    }
+    
+    //Listeners
     @Override
     public void joinPlayerLobby(String playername) {
         
@@ -93,7 +121,6 @@ public class IArena extends Arena {
         }, 25L);
         super.joinPlayerLobby(playername);
         m.lobbyScoreBoard.updateScoreboard(m, this);
-        verboseArenaData();
     }
 
     @Override
@@ -107,7 +134,6 @@ public class IArena extends Arena {
             ip.getTeam().removePlayer(ip);
         }
         super.leavePlayer(playername, fullLeave);
-        verboseArenaData();
     }
 
     @Override
@@ -129,16 +155,10 @@ public class IArena extends Arena {
         teams.get(teams.indexOf(team)).addPlayer(player);
         players.get(p).setTeam(team);
         m.lobbyScoreBoard.updateScoreboard(m, this);
-        verboseArenaData();
-    }
-    public ArrayList<Team> getTeams(){
-        return this.teams;
-    }
-
-    public TeamSelectorGui getTeamSelectorGui() {
-        return this.teamgui;
     }
     
+    
+    //Dev
     public void verboseArenaData(){
         try {
             if (players.size()!=0) {
