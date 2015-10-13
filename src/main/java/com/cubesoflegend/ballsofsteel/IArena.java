@@ -69,14 +69,16 @@ public class IArena extends Arena {
 
     @Override
     public void joinPlayerLobby(String playername) {
+        
+        Player p = Bukkit.getPlayer(playername);
+        IPlayer ip = new IPlayer(p);
+        players.put(p, ip);
+
         // Permet de lancer run() après un certain nombre de ticks serveur
         Bukkit.getScheduler().runTaskLater(this.getPlugin(), new Runnable() {
 
             @Override
             public void run() {
-                Player p = Bukkit.getPlayer(playername);
-                IPlayer ip = new IPlayer(p);
-                players.put(p, ip);
                 if (p != null) {
                     if (m.pli.global_players.containsKey(p.getName())) {
                         ItemStack teamselector = new ItemStack(Material.WOOL, 1, (byte) 14);
@@ -91,6 +93,7 @@ public class IArena extends Arena {
         }, 25L);
         super.joinPlayerLobby(playername);
         m.lobbyScoreBoard.updateScoreboard(m, this);
+        verboseArenaData();
     }
 
     @Override
@@ -104,6 +107,7 @@ public class IArena extends Arena {
             ip.getTeam().removePlayer(ip);
         }
         super.leavePlayer(playername, fullLeave);
+        verboseArenaData();
     }
 
     @Override
@@ -124,8 +128,8 @@ public class IArena extends Arena {
         }
         teams.get(teams.indexOf(team)).addPlayer(player);
         players.get(p).setTeam(team);
-        verboseArenaData();
         m.lobbyScoreBoard.updateScoreboard(m, this);
+        verboseArenaData();
     }
     public ArrayList<Team> getTeams(){
         return this.teams;
@@ -136,17 +140,41 @@ public class IArena extends Arena {
     }
     
     public void verboseArenaData(){
-        System.out.println(" Printing players ...");
-        for (Map.Entry<Player, IPlayer> m_p_ip : players.entrySet()) {
-            System.out.println(" - - Player : " + m_p_ip.getValue().getPlayer().getName() + " => " + m_p_ip.getValue().getTeam().getName());
-        }
-        
-        System.out.println(" Printing teams ...");
-        for (Team team : teams) {
-            System.out.println(" - - Team " + team.getName() + "(" + team.getPlayers().size() +")");
-            for (IPlayer player : team.getPlayers()) {
-                System.out.println(" - - - - " + player.getPlayer().getName());
+        try {
+            if (players.size()!=0) {
+                System.out.println(" Printing players ...");
+                for (Map.Entry<Player, IPlayer> m_p_ip : players.entrySet()) {
+                    String playerInfo = " - - Player : " + m_p_ip.getValue().getPlayer().getName();
+                    if(m_p_ip.getValue().getTeam() == null){
+                        playerInfo += " => no team";
+                    }
+                    else
+                    {
+                        playerInfo += " => " + m_p_ip.getValue().getTeam().getName();
+                    }
+                    System.out.println(playerInfo);
+                }
             }
+            else
+            {
+                System.out.println("No players...");
+            }
+            
+            if(teams.size()!=0){
+                System.out.println(" Printing teams ...");
+                for (Team team : teams) {
+                    System.out.println(" - - Team " + team.getName() + "(" + team.getPlayers().size() +")");
+                    for (IPlayer player : team.getPlayers()) {
+                        System.out.println(" - - - - " + player.getPlayer().getName());
+                    }
+                }
+            }
+            else
+            {
+                System.out.println("No teams...");
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
 }
