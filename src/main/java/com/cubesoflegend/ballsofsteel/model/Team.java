@@ -1,10 +1,11 @@
-package com.cubesoflegend.ballsofsteel;
+package com.cubesoflegend.ballsofsteel.model;
 
 import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
+import com.cubesoflegend.ballsofsteel.IPlayer;
 import com.cubesoflegend.ballsofsteel.utils.ColorUtils;
 
 public class Team {

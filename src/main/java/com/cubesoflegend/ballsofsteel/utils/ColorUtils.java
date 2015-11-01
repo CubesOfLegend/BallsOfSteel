@@ -10,6 +10,7 @@ public final class ColorUtils {
     
     public static final HashBiMap<String, ItemStack> bimapColorItemStack;
     static{
+        
         bimapColorItemStack = HashBiMap.create();
         bimapColorItemStack.put("bleu", new ItemStack(Material.WOOL, 1, (byte) 11));
         bimapColorItemStack.put("rouge", new ItemStack(Material.WOOL, 1, (byte) 14));

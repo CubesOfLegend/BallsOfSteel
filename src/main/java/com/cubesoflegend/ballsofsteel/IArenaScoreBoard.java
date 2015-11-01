@@ -13,6 +13,7 @@ import org.bukkit.scoreboard.ScoreboardManager;
 
 import com.comze_instancelabs.minigamesapi.Arena;
 import com.comze_instancelabs.minigamesapi.util.ArenaScoreboard;
+import com.cubesoflegend.ballsofsteel.model.Team;
 
 public class IArenaScoreBoard extends ArenaScoreboard {
     HashMap<String, Scoreboard> ascore = new HashMap<String, Scoreboard>();

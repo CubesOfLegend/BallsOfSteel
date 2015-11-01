@@ -2,6 +2,8 @@ package com.cubesoflegend.ballsofsteel;
 
 import org.bukkit.entity.Player;
 
+import com.cubesoflegend.ballsofsteel.model.Team;
+
 public class IPlayer{
     
     private Player player;

@@ -1,6 +1,6 @@
 name: BallsOfSteel
 main: com.cubesoflegend.ballsofsteel.Main
-version: 0.0.1
+version: 0.3.3-dev
 depend: [MinigamesLib]
 commands:
    bos:
@@ -14,6 +14,11 @@ commands:
    bos removespawn:
       description: Permet de supprimer un spawn pour une arène et une équipe.
       usage: /bos removespawn <arene> [Bleu:1/Rouge:2/Jaune:3/Vert:4/Rose:5/Violet:6/Orange:7/Noir:8/Blanc:9]
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup".
+   bos setbasebounds:
+      description: Permet de setter les bounds d'une base
+      usage : /bos setbasebounds <arene> [Bleu:1/Rouge:2/Jaune:3/Vert:4/Rose:5/Violet:6/Orange:7/Noir:8/Blanc:9] [low/high]
       permission: mgbos.setup
       permission-message: Vous n'avez pas la permission "mgbos.setup".
    bos setlobby:

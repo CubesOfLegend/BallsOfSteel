@@ -19,7 +19,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.comze_instancelabs.minigamesapi.Arena;
 import com.comze_instancelabs.minigamesapi.MinigamesAPI;
 import com.comze_instancelabs.minigamesapi.PluginInstance;
+import com.comze_instancelabs.minigamesapi.util.Cuboid;
+import com.comze_instancelabs.minigamesapi.util.Util;
 import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
+import com.cubesoflegend.ballsofsteel.model.Spawn;
+import com.cubesoflegend.ballsofsteel.model.Team;
 
 public class IArena extends Arena {
     public Main m;
@@ -42,11 +46,11 @@ public class IArena extends Arena {
         pli = api.getPluginInstance(m);
         players = new HashMap<Player, IPlayer>();
         teams = new ArrayList<Team>();
+        spawns = new ArrayList<Spawn>();
         
         // On récupere la configuration
         FileConfiguration config = pli.getArenasConfig().getConfig();
         if (config.isSet("arenas." + name + ".spawns.spawn0")) {
-            Location loc;
             ConfigurationSection spawnConfig;
             Set<String> spawnnames = config.getConfigurationSection("arenas." + name + ".spawns").getKeys(false);
             // Boucle sur les noms de spawns
@@ -54,11 +58,12 @@ public class IArena extends Arena {
                 if (!spawnname.replace("spawn", "").equalsIgnoreCase("0")) {
                     spawnConfig = config.getConfigurationSection("arenas." + name + ".spawns." + spawnname);
                     World world = Bukkit.getWorld(spawnConfig.getString("world"));
-                    loc = new Location(world, spawnConfig.getDouble("location.x"), spawnConfig.getDouble("location.y"),
-                            spawnConfig.getDouble("location.z"), spawnConfig.getLong("location.yaw"),
-                            spawnConfig.getLong("location.pitch"));
-
-                    Spawn spawn = new Spawn(spawnname, loc);
+                    Location spawnLoc = Util.getComponentForArena(m, name, "spawns."+spawnname);
+                    Spawn spawn = new Spawn(spawnname, spawnLoc);
+                    Location lowSpawnBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".bounds.low");
+                    Location highSpawnBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".bounds.high");
+                    spawn.setBounds(new Cuboid(lowSpawnBound, highSpawnBound));
+                    spawns.add(spawn);
                     Team team = new Team(spawnname.replace("spawn", ""), spawn);
                     teams.add(team);
                 }
@@ -140,7 +145,7 @@ public class IArena extends Arena {
     public void start(boolean tp) {
         //On renvoie toutes les teams à leur spawns respectifs
         for (Team team : teams) {
-            team.teleportTeam(team.getSpawn().location);
+            team.teleportTeam(team.getSpawn().getLocation());
         }
         super.start(false);
         return;

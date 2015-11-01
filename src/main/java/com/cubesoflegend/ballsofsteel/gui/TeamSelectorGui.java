@@ -12,8 +12,8 @@ import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.util.IconMenu;
 import com.cubesoflegend.ballsofsteel.IArena;
 import com.cubesoflegend.ballsofsteel.Main;
-import com.cubesoflegend.ballsofsteel.Team;
 import com.cubesoflegend.ballsofsteel.config.IMessagesConfig;
+import com.cubesoflegend.ballsofsteel.model.Team;
 import com.cubesoflegend.ballsofsteel.utils.ColorUtils;
 
 public class TeamSelectorGui {

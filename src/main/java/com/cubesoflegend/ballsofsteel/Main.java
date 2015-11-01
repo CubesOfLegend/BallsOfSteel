@@ -1,21 +1,17 @@
 package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.comze_instancelabs.minigamesapi.Arena;
@@ -31,21 +27,25 @@ import com.comze_instancelabs.minigamesapi.util.Util;
 import com.comze_instancelabs.minigamesapi.util.Validator;
 import com.cubesoflegend.ballsofsteel.config.IMessagesConfig;
 import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
+import com.cubesoflegend.ballsofsteel.model.Spawn;
+import com.cubesoflegend.ballsofsteel.model.Team;
+import com.cubesoflegend.ballsofsteel.utils.BoundsUtil;
 
 public class Main extends JavaPlugin implements Listener {
-
+    
     MinigamesAPI api = null;
     PluginInstance pli = null;
-    ICommandHandler cmdhandler = new ICommandHandler();
+    ICommandHandler cmdhandler;
+    
+    public IMessagesConfig im;
     public IArenaScoreBoard scoreboard;
     public IArenaLobbyScoreBoard lobbyScoreBoard;
     static Main m = null;
 
     public void onEnable() {
         m = this;
-        api = MinigamesAPI.getAPI().setupAPI(this, "BallsOfSteel", IArena.class, new ArenasConfig(this),
-                new IMessagesConfig(this), new ClassesConfig(this, false), new StatsConfig(this, false),
-                new DefaultConfig(this, false), false);
+        this.im = new IMessagesConfig(this);
+        api = MinigamesAPI.getAPI().setupAPI(this, "BallsOfSteel", IArena.class, new ArenasConfig(this), im, new ClassesConfig(this, false), new StatsConfig(this, false), new DefaultConfig(this, false), false);
         PluginInstance pinstance = api.pinstances.get(this);
         pinstance.addLoadedArenas(loadArenas(this, pinstance.getArenasConfig()));
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -53,7 +53,8 @@ public class Main extends JavaPlugin implements Listener {
         lobbyScoreBoard = new IArenaLobbyScoreBoard(pinstance, this);
         pinstance.scoreboardLobbyManager = lobbyScoreBoard;
         pinstance.scoreboardManager = scoreboard;
-        pli = pinstance;
+        this.pli = pinstance;
+        this.cmdhandler = new ICommandHandler(this);
     }
 
     public static ArrayList<Arena> loadArenas(JavaPlugin plugin, ArenasConfig cf) {
@@ -82,6 +83,22 @@ public class Main extends JavaPlugin implements Listener {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         return cmdhandler.handleArgs(this, "bos", "/" + cmd.getName(), sender, args);
     }
+    
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event){
+        if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
+            IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
+            IPlayer ip = a.getPlayers().get(event.getPlayer());
+            if(a.getArenaState() == ArenaState.INGAME){
+                for (Team team : a.teams) {
+                    if(BoundsUtil.isInArea(event.getTo(), team.getSpawn().getBounds()) && ip.getTeam() != team){
+                        ip.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', im.not_allowed_enter_in_base.replace("<team>", team.getChatColoredName())));
+                        event.setCancelled(true);
+                    }
+                }
+            }
+        }
+    }
 
     /*
     @EventHandler
@@ -103,6 +120,7 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
     */
+    
     
     @EventHandler
     //Clic du joueur dans le menu
