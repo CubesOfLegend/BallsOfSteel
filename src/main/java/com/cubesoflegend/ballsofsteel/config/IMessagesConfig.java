@@ -13,7 +13,6 @@ public class IMessagesConfig extends MessagesConfig {
     public String successfully_set_team_component = "&a Successfully set <component> for team <team>";
     public String not_allowed_enter_in_base= "&c You're not allowed to enter in <team>&c base";
     
-    
     public IMessagesConfig(JavaPlugin plugin){
         
         super(plugin);
@@ -31,6 +30,6 @@ public class IMessagesConfig extends MessagesConfig {
         this.team_not_exists = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.team_not_exists"));
         this.possible_teams_are = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.possible_teams_are"));
         this.successfully_set_team_component = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.successfully_set_team_component"));
-        this.successfully_set_team_component = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.not_allowed_enter_in_base"));
+        this.not_allowed_enter_in_base = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.not_allowed_enter_in_base"));
     }
 }

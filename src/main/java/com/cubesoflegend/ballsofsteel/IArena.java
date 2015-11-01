@@ -22,7 +22,7 @@ import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.util.Cuboid;
 import com.comze_instancelabs.minigamesapi.util.Util;
 import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
-import com.cubesoflegend.ballsofsteel.model.Spawn;
+import com.cubesoflegend.ballsofsteel.model.Base;
 import com.cubesoflegend.ballsofsteel.model.Team;
 
 public class IArena extends Arena {
@@ -30,7 +30,7 @@ public class IArena extends Arena {
     ArrayList<Team> teams;
     MinigamesAPI api;
     PluginInstance pli;
-    ArrayList<Spawn> spawns;
+    ArrayList<Base> spawns;
     HashMap<Player, IPlayer> players;
     private TeamSelectorGui teamgui;
 
@@ -46,7 +46,7 @@ public class IArena extends Arena {
         pli = api.getPluginInstance(m);
         players = new HashMap<Player, IPlayer>();
         teams = new ArrayList<Team>();
-        spawns = new ArrayList<Spawn>();
+        spawns = new ArrayList<Base>();
         
         // On récupere la configuration
         FileConfiguration config = pli.getArenasConfig().getConfig();
@@ -59,7 +59,7 @@ public class IArena extends Arena {
                     spawnConfig = config.getConfigurationSection("arenas." + name + ".spawns." + spawnname);
                     World world = Bukkit.getWorld(spawnConfig.getString("world"));
                     Location spawnLoc = Util.getComponentForArena(m, name, "spawns."+spawnname);
-                    Spawn spawn = new Spawn(spawnname, spawnLoc);
+                    Base spawn = new Base(spawnname, spawnLoc);
                     Location lowSpawnBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".bounds.low");
                     Location highSpawnBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".bounds.high");
                     spawn.setBounds(new Cuboid(lowSpawnBound, highSpawnBound));
@@ -145,7 +145,7 @@ public class IArena extends Arena {
     public void start(boolean tp) {
         //On renvoie toutes les teams à leur spawns respectifs
         for (Team team : teams) {
-            team.teleportTeam(team.getSpawn().getLocation());
+            team.teleportTeam(team.getBase().getLocation());
         }
         super.start(false);
         return;

@@ -11,12 +11,12 @@ import com.cubesoflegend.ballsofsteel.utils.ColorUtils;
 public class Team {
     private ArrayList<IPlayer> players;
     private String name;
-    private Spawn spawn;
+    private Base base;
 
-    public Team(String name, Spawn spawn) {
+    public Team(String name, Base spawn) {
         this.players = new ArrayList<IPlayer>();
         this.name = name;
-        this.spawn = spawn;
+        this.base = spawn;
     }
 
     public ArrayList<IPlayer> getPlayers() {
@@ -57,12 +57,12 @@ public class Team {
         this.players.remove(player);
     }
 
-    public Spawn getSpawn() {
-        return spawn;
+    public Base getBase() {
+        return base;
     }
 
-    public void setSpawn(Spawn spawn) {
-        this.spawn = spawn;
+    public void setBase(Base base) {
+        this.base = base;
     }
     
     public void teleportTeam(Location location){

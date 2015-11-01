@@ -2,16 +2,22 @@ package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
 
+import javax.swing.plaf.BorderUIResource.MatteBorderUIResource;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.material.Chest;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.comze_instancelabs.minigamesapi.Arena;
@@ -27,7 +33,7 @@ import com.comze_instancelabs.minigamesapi.util.Util;
 import com.comze_instancelabs.minigamesapi.util.Validator;
 import com.cubesoflegend.ballsofsteel.config.IMessagesConfig;
 import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
-import com.cubesoflegend.ballsofsteel.model.Spawn;
+import com.cubesoflegend.ballsofsteel.model.Base;
 import com.cubesoflegend.ballsofsteel.model.Team;
 import com.cubesoflegend.ballsofsteel.utils.BoundsUtil;
 
@@ -91,7 +97,7 @@ public class Main extends JavaPlugin implements Listener {
             IPlayer ip = a.getPlayers().get(event.getPlayer());
             if(a.getArenaState() == ArenaState.INGAME){
                 for (Team team : a.teams) {
-                    if(BoundsUtil.isInArea(event.getTo(), team.getSpawn().getBounds()) && ip.getTeam() != team){
+                    if(BoundsUtil.isInArea(event.getTo(), team.getBase().getBounds()) && ip.getTeam() != team){
                         ip.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', im.not_allowed_enter_in_base.replace("<team>", team.getChatColoredName())));
                         event.setCancelled(true);
                     }
@@ -121,25 +127,35 @@ public class Main extends JavaPlugin implements Listener {
     }
     */
     
-    
     @EventHandler
     //Clic du joueur dans le menu
     public void onInteract(final PlayerInteractEvent event) {
-        if (event.hasItem()) {
-            if (pli.global_players.containsKey(event.getPlayer().getName())) {
-                //On récupére l'IArena dans laquelle se trouve le joueur
-                IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
-                if (event.getItem().getType() == Material.WOOL) {
-                    //Si l'arene est en jeu && 
-                    if (ia.getArenaState() != ArenaState.INGAME && !ia.isArcadeMain() && !ia.getIngameCountdownStarted()) {
-                        TeamSelectorGui teamgui = ia.getTeamSelectorGui();
-                        teamgui.openGUI(event.getPlayer().getName());
+        if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
+            IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
+            IPlayer ip = ia.getPlayers().get(event.getPlayer());
+            if (ia.getArenaState() != ArenaState.INGAME) {
+                //Open teamselector
+                if(!ia.isArcadeMain() && !ia.getIngameCountdownStarted() && event.hasItem() && event.getItem().getType() == Material.WOOL){
+                    TeamSelectorGui teamgui = ia.getTeamSelectorGui();
+                    teamgui.openGUI(event.getPlayer().getName());
+                }
+                //Forbid interact with all blocks in arena if arena is not in game
+                if(event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction()==Action.LEFT_CLICK_BLOCK){
+                    event.setCancelled(true);
+                }
+            }
+            //Arenastate = INGAME
+            else{
+                //Toute interaction avec un block
+                if(event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction()==Action.LEFT_CLICK_BLOCK){
+                    for (Team team : ia.teams) {
+                        //block se trouvant dans une base ennemie
+                        if(BoundsUtil.isInArea(event.getClickedBlock().getLocation(), team.getBase().getBounds()) && ip.getTeam() != team){
+                            event.setCancelled(true);
+                        }
                     }
                 }
             }
         }
     }
-    
-    
-    
 }

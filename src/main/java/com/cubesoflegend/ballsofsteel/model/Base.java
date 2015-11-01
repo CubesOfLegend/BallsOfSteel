@@ -4,13 +4,13 @@ import org.bukkit.Location;
 
 import com.comze_instancelabs.minigamesapi.util.Cuboid;
 
-public class Spawn {
+public class Base {
 
     private String name;
     private Location location;
     private Cuboid bounds;
 
-    public Spawn(String name, Location location) {
+    public Base(String name, Location location) {
         this.name = name;
         this.location = location;
     }
