@@ -102,6 +102,8 @@ public class ICommandHandler extends CommandHandler {
                 return this.getStats(pli, sender, args, uber_permission, cmd, action, plugin, p);
             } else if (action.equalsIgnoreCase("setbasebounds")) {
                 return this.setBaseBounds(pli, sender, args, uber_permission, cmd, action, plugin, p);
+            } else if (action.equalsIgnoreCase("setteamdepot")) {
+                return this.setTeamDepot(pli, sender, args, uber_permission, cmd, action, plugin, p);
             } else if (action.equalsIgnoreCase("help")) {
                 sendHelp(cmd, sender);
             } else if (action.equalsIgnoreCase("list")) {
@@ -242,8 +244,7 @@ public class ICommandHandler extends CommandHandler {
         return true;
     }
 
-    public boolean setBaseBounds(PluginInstance pli, CommandSender sender, String[] args, String uber_permission,
-            String cmd, String action, JavaPlugin plugin, Player p) {
+    public boolean setBaseBounds(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd, String action, JavaPlugin plugin, Player p) {
         Player player = Bukkit.getPlayer(sender.getName());
         if (sender.hasPermission(uber_permission + ".setup")) {
             if (args.length == 4 && (args[3].equalsIgnoreCase("low") || args[3].equalsIgnoreCase("high"))) {
@@ -258,6 +259,37 @@ public class ICommandHandler extends CommandHandler {
                             pli.arenaSetup.setBoundaries(plugin, args[1], player.getLocation(), false, "spawns.spawn"+args[2].toLowerCase());
                             sender.sendMessage(m.im.successfully_set_team_component.replaceAll("<team>", args[2])
                                     .replaceAll("<component>", " high teambase bounds"));
+                        }
+                    } else {
+                        sender.sendMessage("The spawn " + args[2] + "doesn't exists");
+                    }
+            } else {
+                sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]"
+                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> <team>");
+            }
+        } else {
+            sender.sendMessage(pli.getMessagesConfig().no_perm);
+        }
+        return true;
+    }
+    
+    public boolean setTeamDepot(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd, String action, JavaPlugin plugin, Player p){
+        
+        Player player = Bukkit.getPlayer(sender.getName());
+        
+        if (sender.hasPermission(uber_permission + ".setup")) {
+            if (args.length == 4 && (args[3].equalsIgnoreCase("low") || args[3].equalsIgnoreCase("high"))) {
+                    if (validator.spawnExist(args[1] , args[2].toLowerCase())) {
+                        if(args[3].equalsIgnoreCase("low")){
+                            pli.arenaSetup.setBoundaries(plugin, args[1], player.getLocation(), true, "spawns.spawn"+args[2].toLowerCase()+".depot");
+                            sender.sendMessage(m.im.successfully_set_team_component.replaceAll("<team>", args[2])
+                                    .replaceAll("<component>", " low depot team bounds"));
+                        }
+                        else if(args[3].equalsIgnoreCase("high"))
+                        {
+                            pli.arenaSetup.setBoundaries(plugin, args[1], player.getLocation(), false, "spawns.spawn"+args[2].toLowerCase()+".depot");
+                            sender.sendMessage(m.im.successfully_set_team_component.replaceAll("<team>", args[2])
+                                    .replaceAll("<component>", " high depot team bounds"));
                         }
                     } else {
                         sender.sendMessage("The spawn " + args[2] + "doesn't exists");
