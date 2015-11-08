@@ -100,10 +100,12 @@ public class ICommandHandler extends CommandHandler {
                 return this.getLeaderboards(pli, sender, args, uber_permission, cmd, action, plugin, p);
             } else if (action.equalsIgnoreCase("stats")) {
                 return this.getStats(pli, sender, args, uber_permission, cmd, action, plugin, p);
-            } else if (action.equalsIgnoreCase("setbasebounds")) {
-                return this.setBaseBounds(pli, sender, args, uber_permission, cmd, action, plugin, p);
-            } else if (action.equalsIgnoreCase("setteamdepot")) {
-                return this.setTeamDepot(pli, sender, args, uber_permission, cmd, action, plugin, p);
+            } else if (action.equalsIgnoreCase("setteambounds")) {
+                return this.setTeamBounds(pli, sender, args, uber_permission, cmd, action, plugin, p);
+            } else if (action.equalsIgnoreCase("setdepotbounds")) {
+                return this.setDepotBounds(pli, sender, args, uber_permission, cmd, action, plugin, p);
+            } else if (action.equalsIgnoreCase("setcenterbounds")) {
+                return this.setCenterBounds(pli, sender, args, uber_permission, cmd, action, plugin, p);
             } else if (action.equalsIgnoreCase("help")) {
                 sendHelp(cmd, sender);
             } else if (action.equalsIgnoreCase("list")) {
@@ -244,7 +246,7 @@ public class ICommandHandler extends CommandHandler {
         return true;
     }
 
-    public boolean setBaseBounds(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd, String action, JavaPlugin plugin, Player p) {
+    public boolean setTeamBounds(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd, String action, JavaPlugin plugin, Player p) {
         Player player = Bukkit.getPlayer(sender.getName());
         if (sender.hasPermission(uber_permission + ".setup")) {
             if (args.length == 4 && (args[3].equalsIgnoreCase("low") || args[3].equalsIgnoreCase("high"))) {
@@ -265,7 +267,7 @@ public class ICommandHandler extends CommandHandler {
                     }
             } else {
                 sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]"
-                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> <team>");
+                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> <team> [low/high]");
             }
         } else {
             sender.sendMessage(pli.getMessagesConfig().no_perm);
@@ -273,7 +275,7 @@ public class ICommandHandler extends CommandHandler {
         return true;
     }
     
-    public boolean setTeamDepot(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd, String action, JavaPlugin plugin, Player p){
+    public boolean setDepotBounds(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd, String action, JavaPlugin plugin, Player p){
         
         Player player = Bukkit.getPlayer(sender.getName());
         
@@ -296,7 +298,32 @@ public class ICommandHandler extends CommandHandler {
                     }
             } else {
                 sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]"
-                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> <team>");
+                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> <team> [low/high]");
+            }
+        } else {
+            sender.sendMessage(pli.getMessagesConfig().no_perm);
+        }
+        return true;
+    }
+    
+    public boolean setCenterBounds(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd, String action, JavaPlugin plugin, Player p){
+        
+        Player player = Bukkit.getPlayer(sender.getName());
+        
+        if (sender.hasPermission(uber_permission + ".setup")) {
+            if (args.length == 3 && (args[2].equalsIgnoreCase("low") || args[2].equalsIgnoreCase("high"))) {
+                if(args[2].equalsIgnoreCase("low")){
+                    pli.arenaSetup.setBoundaries(plugin, args[1], player.getLocation(), true, "center");
+                    sender.sendMessage(m.im.successfully_set.replaceAll("<component>", " low center arena bounds"));
+                }
+                else if(args[2].equalsIgnoreCase("high"))
+                {
+                    pli.arenaSetup.setBoundaries(plugin, args[1], player.getLocation(), false, "center");
+                    sender.sendMessage(m.im.successfully_set.replaceAll("<component>", " high center arena bounds"));
+                }
+            } else {
+                sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]"
+                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> [low/high]");
             }
         } else {
             sender.sendMessage(pli.getMessagesConfig().no_perm);
