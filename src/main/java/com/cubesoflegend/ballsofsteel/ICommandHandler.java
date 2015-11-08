@@ -1,6 +1,7 @@
 package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,10 +24,57 @@ public class ICommandHandler extends CommandHandler {
 
     Main m;
     Validator validator;
+    public static LinkedHashMap<String, String> cmddesc;
+    static {
+        cmddesc = new LinkedHashMap<String, String>();
+        cmddesc.put("", "");
+        cmddesc.put("setspawn <arena> <team>", "Sets the team spawn point. (One spawn, one team)");
+        cmddesc.put("setlobby <arena>", "Sets the lobby point.");
+        cmddesc.put("setmainlobby", "Sets the main lobby point.");
+        cmddesc.put("setbounds <arena> <low/high>", "Sets the low or high boundary point for later arena regeneration.");
+        cmddesc.put("setteambounds <arena> <team> <low/high>", "Sets the low or high boundary point for team base");
+        cmddesc.put("setdepotbounds <arena> <team> <low/high>", "Sets the low or high boundary point for team depot");
+        cmddesc.put("setcenterbounds <arena> <low/high>", "Sets the low or high boundary point for center arena");
+        cmddesc.put("savearena <arena>", "Saves the arena.");
+        cmddesc.put(" ", "");
+        cmddesc.put("setmaxplayers <arena> <count>", "Sets the max players allowed to join to given count.");
+        cmddesc.put("setminplayers <arena> <count>", "Sets the min players needed to start to given count.");
+        cmddesc.put("setteammaxplayers <arena> <team> <count>", "Sets the max players allowed to join team to given count.");
+        cmddesc.put("setteamminplayers <arena> <team> <count>", "Sets the min players needed in team to given count.");
+        cmddesc.put("setarenavip <arena> <true/false>", "Sets whether arena needs permission to join.");
+        cmddesc.put("removearena <arena>", "Deletes an arena from config.");
+        cmddesc.put("removespawn <arena> <count>", "Deletes a spawn from config.");
+        cmddesc.put("setenabled", "Enables/Disables the arena.");
+        cmddesc.put("join <arena>", "Joins the arena.");
+        cmddesc.put("leave", "Leaves the arena.");
+        cmddesc.put("start <arena>", "Forces the arena to start.");
+        cmddesc.put("stop <arena>", "Forces the arena to stop.");
+        cmddesc.put("list", "Lists all arenas.");
+        cmddesc.put("reload", "Reloads the config.");
+        cmddesc.put("reset <arena>", "Forces the arena to reset.");
+        cmddesc.put("setlobbybounds <arena> <low/high>", "Optional: Set lobby boundaries.");
+        cmddesc.put("setspecbounds <arena> <low/high>", "Optional: Set extra spectator boundaries.");
+        cmddesc.put("setauthor <arena> <author>", "Will always display the author of the map at join.");
+        cmddesc.put("setdescription <arena> <description>", "Will always display a description of the map at join.");
+        cmddesc.put("setdisplayname <arena> <displayname>", "Allows changing displayname of an arena (whitespaces and colors).");
+        cmddesc.put("setdisplayname <arena> <displayname>", "Allows changing displayname of an arena (whitespaces and colors).");
+    }
 
     public ICommandHandler(Main m) {
         this.m = m;
         this.validator = new Validator(this.m.pli);
+    }
+
+    public static void sendHelp(String cmd, CommandSender sender) {
+        sender.sendMessage(ChatColor.DARK_GRAY + "------- " + ChatColor.BLUE + "Help" + ChatColor.DARK_GRAY + " -------");
+        for (String k : cmddesc.keySet()) {
+            if (k.length() < 3) {
+                sender.sendMessage("");
+                continue;
+            }
+            String v = cmddesc.get(k);
+            sender.sendMessage(ChatColor.DARK_AQUA + cmd + " " + k + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + v);
+        }
     }
 
     @Override
@@ -106,6 +154,10 @@ public class ICommandHandler extends CommandHandler {
                 return this.setDepotBounds(pli, sender, args, uber_permission, cmd, action, plugin, p);
             } else if (action.equalsIgnoreCase("setcenterbounds")) {
                 return this.setCenterBounds(pli, sender, args, uber_permission, cmd, action, plugin, p);
+            } else if (action.equalsIgnoreCase("setteamminplayers")) {
+                return this.setTeamMinPlayers(pli, sender, args, uber_permission, cmd, action, plugin, p);
+            } else if (action.equalsIgnoreCase("setteammaxplayers")) {
+                return this.setTeamMaxPlayers(pli, sender, args, uber_permission, cmd, action, plugin, p);
             } else if (action.equalsIgnoreCase("help")) {
                 sendHelp(cmd, sender);
             } else if (action.equalsIgnoreCase("list")) {
@@ -159,30 +211,7 @@ public class ICommandHandler extends CommandHandler {
         }
         return true;
     }
-
-    @Override
-    public boolean setSpawn(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd,
-            String action, JavaPlugin plugin, Player p) {
-
-        if (sender.hasPermission(uber_permission + ".setup")) {
-            if (args.length > 2) {
-                String team = args[2].toLowerCase();
-                if (validator.isValidTeamArgument(team)) {
-                    Util.saveComponentForArena(plugin, args[1], "spawns.spawn" + team, p.getLocation());
-                    sender.sendMessage(m.im.successfully_set_team_component.replaceAll("<component>", "spawn").replaceAll("<team>", ColorUtils.bimapColorChatColor.get("team") + team));
-                } else {
-                    sender.sendMessage(m.im.team_not_exists.replaceAll("<team>", team));
-                    sender.sendMessage(m.im.possible_teams_are.replaceAll("<teams>","Bleu, Rouge, Jaune, Vert, Rose, Violet, Orange, Noir, Blanc"));
-                }
-            } else {
-                sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]" + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> <team>");
-            }
-        } else {
-            sender.sendMessage(pli.getMessagesConfig().no_perm);
-        }
-        return true;
-    }
-
+    
     @Override
     public boolean saveArena(PluginInstance pli, CommandSender sender, String[] args, String uber_permission,
             String cmd, String action, JavaPlugin plugin, Player p) {
@@ -196,7 +225,7 @@ public class ICommandHandler extends CommandHandler {
             return true;
         }
         if (args.length == 2) {
-
+            
             Arena temp = pli.arenaSetup.saveArena(plugin, args[1]);
             if (temp != null) {
                 sender.sendMessage(pli.getMessagesConfig().successfully_saved_arena.replaceAll("<arena>", args[1]));
@@ -209,6 +238,30 @@ public class ICommandHandler extends CommandHandler {
         }
         return true;
     }
+
+    @Override
+    public boolean setSpawn(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd,
+            String action, JavaPlugin plugin, Player p) {
+
+        if (sender.hasPermission(uber_permission + ".setup")) {
+            if (args.length > 2) {
+                String team = args[2].toLowerCase();
+                if (validator.isValidTeamArgument(team)) {
+                    Util.saveComponentForArena(plugin, args[1], "spawns.spawn" + team, p.getLocation());
+                    sender.sendMessage(m.im.successfully_set_team_component.replaceAll("<component>", "spawn").replaceAll("<team>", ColorUtils.bimapColorChatColor.get(team) + team));
+                } else {
+                    sender.sendMessage(m.im.team_not_exists.replaceAll("<team>", team));
+                    sender.sendMessage(m.im.possible_teams_are.replaceAll("<teams>","Bleu, Rouge, Jaune, Vert, Rose, Violet, Orange, Noir, Blanc"));
+                }
+            } else {
+                sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]" + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc]");
+            }
+        } else {
+            sender.sendMessage(pli.getMessagesConfig().no_perm);
+        }
+        return true;
+    }
+
 
     @Override
     public boolean removeSpawn(PluginInstance pli, CommandSender sender, String[] args, String uber_permission,
@@ -225,7 +278,7 @@ public class ICommandHandler extends CommandHandler {
                         config.getConfig().set(path, null);
                         config.saveConfig();
                         sender.sendMessage(pli.getMessagesConfig().successfully_removed.replaceAll("<component>",
-                                "spawn " + args[2]));
+                                "spawn " + ColorUtils.bimapColorChatColor.get(team) + team));
                     } else {
                         sender.sendMessage(pli.getMessagesConfig().failed_removing_component
                                 .replaceAll("<component>", "spawn " + args[2])
@@ -238,7 +291,7 @@ public class ICommandHandler extends CommandHandler {
                 }
             } else {
                 sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]"
-                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> <team>");
+                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc]");
             }
         } else {
             sender.sendMessage(pli.getMessagesConfig().no_perm);
@@ -263,11 +316,11 @@ public class ICommandHandler extends CommandHandler {
                                     .replaceAll("<component>", " high teambase bounds"));
                         }
                     } else {
-                        sender.sendMessage("The spawn " + args[2] + "doesn't exists");
+                        sender.sendMessage("The spawn " + args[2] + " doesn't exists");
                     }
             } else {
                 sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]"
-                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> <team> [low/high]");
+                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] [low/high]");
             }
         } else {
             sender.sendMessage(pli.getMessagesConfig().no_perm);
@@ -298,7 +351,7 @@ public class ICommandHandler extends CommandHandler {
                     }
             } else {
                 sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]"
-                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> <team> [low/high]");
+                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] [low/high]");
             }
         } else {
             sender.sendMessage(pli.getMessagesConfig().no_perm);
@@ -324,6 +377,56 @@ public class ICommandHandler extends CommandHandler {
             } else {
                 sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]"
                         + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> [low/high]");
+            }
+        } else {
+            sender.sendMessage(pli.getMessagesConfig().no_perm);
+        }
+        return true;
+    }
+    
+    public boolean setTeamMinPlayers(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd, String action, JavaPlugin plugin, Player p){
+        
+        if (sender.hasPermission(uber_permission + ".setup")) {
+            if (args.length == 4 && validator.isNumeric(args[3])) {
+                Integer count = Integer.parseInt(args[3]);
+                String team = args[2].toLowerCase();
+                if (validator.spawnExist(args[1], team)) {
+                    ArenasConfig config = MinigamesAPI.getAPI().getPluginInstance(plugin).getArenasConfig();
+                    String path = "arenas." + args[1] + ".spawns.spawn" + team + ".min_players";
+                    config.getConfig().set(path, count);
+                    config.saveConfig();
+                    sender.sendMessage(m.im.successfully_set_team_component.replaceAll("<team>", team).replaceAll("<component>", " minimum players"));
+                } else {
+                    sender.sendMessage("The spawn " + args[2] + " doesn't exists");
+                }
+            } else {
+                sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]"
+                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] <nombre>");
+            }
+        } else {
+            sender.sendMessage(pli.getMessagesConfig().no_perm);
+        }
+        return true;
+    }
+    
+    public boolean setTeamMaxPlayers(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd, String action, JavaPlugin plugin, Player p){
+        
+        if (sender.hasPermission(uber_permission + ".setup")) {
+            if (args.length == 4 && validator.isNumeric(args[3])) {
+                Integer count = Integer.parseInt(args[3]);
+                String team = args[2].toLowerCase();
+                if (validator.spawnExist(args[1], team)) {
+                    ArenasConfig config = MinigamesAPI.getAPI().getPluginInstance(plugin).getArenasConfig();
+                    String path = "arenas." + args[1] + ".spawns.spawn" + team + ".max_players";
+                    config.getConfig().set(path, count);
+                    config.saveConfig();
+                    sender.sendMessage(m.im.successfully_set_team_component.replaceAll("<team>", team).replaceAll("<component>", " maximum players"));
+                } else {
+                    sender.sendMessage("The spawn " + args[2] + " doesn't exists");
+                }
+            } else {
+                sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]"
+                        + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] <nombre>");
             }
         } else {
             sender.sendMessage(pli.getMessagesConfig().no_perm);

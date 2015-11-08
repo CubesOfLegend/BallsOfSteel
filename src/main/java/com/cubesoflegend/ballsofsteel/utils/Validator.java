@@ -21,4 +21,13 @@ public class Validator {
     public boolean spawnExist(String arenaname, String team){
         return pli.getArenasConfig().getConfig().contains("arenas."+arenaname+".spawns.spawn"+team);
     }
+    
+    public boolean isNumeric(String arg){
+        try {
+            Integer i = Integer.parseInt(arg);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
 }

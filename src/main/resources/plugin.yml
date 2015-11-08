@@ -8,22 +8,31 @@ commands:
       usage: /bos <command>
    bos setspawn:
       description: Permet de placer un spawn pour une arène et une équipe.
-      usage: /bos setspawn <arene> [Bleu:1/Rouge:2/Jaune:3/Vert:4/Rose:5/Violet:6/Orange:7/Noir:8/Blanc:9]
+      usage: /bos setspawn <arene> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc]
       permission: mgbos.setup
       permission-message: Vous n'avez pas la permission "mgbos.setup".
    bos removespawn:
       description: Permet de supprimer un spawn pour une arène et une équipe.
-      usage: /bos removespawn <arene> [Bleu:1/Rouge:2/Jaune:3/Vert:4/Rose:5/Violet:6/Orange:7/Noir:8/Blanc:9]
+      usage: /bos removespawn <arene> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc]
       permission: mgbos.setup
       permission-message: Vous n'avez pas la permission "mgbos.setup".
    bos setteambounds:
       description: Permet de setter les bounds d'une team (Base)
-      usage : /bos setteambounds <arene> [Bleu:1/Rouge:2/Jaune:3/Vert:4/Rose:5/Violet:6/Orange:7/Noir:8/Blanc:9] [low/high]
+      usage : /bos setteambounds <arene> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] [low/high]
       permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup".
+   bos setteamminplayers:
+      description: Permet de setter le nombre minimum de joueurs dans une team
+      usage : /bos setteamminplayers <arene> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] <count>
+      permission: mgbos.setup
+      permission-message: Vous n'avez pas la permission "mgbos.setup".
+   bos setteammaxplayers:
+      description: Permet de setter le nombre maximum de joueurs dans une team
+      usage : /bos setteammaxplayers <arene> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] <count>
       permission-message: Vous n'avez pas la permission "mgbos.setup".
    bos setteamdepot:
       description: Permet de setter les bounds de la zone de depot d'une team
-      usage : /bos setteamdepot <arene> [Bleu:1/Rouge:2/Jaune:3/Vert:4/Rose:5/Violet:6/Orange:7/Noir:8/Blanc:9] [low/high]
+      usage : /bos setteamdepot <arene> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] [low/high]
       permission: mgbos.setup
       permission-message: Vous n'avez pas la permission "mgbos.setup".
    bos setcenterbounds:
