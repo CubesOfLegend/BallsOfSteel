@@ -1,6 +1,7 @@
 package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.swing.plaf.BorderUIResource.MatteBorderUIResource;
 
@@ -11,15 +12,22 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageByBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Chest;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.omg.CORBA.Bounds;
 
+import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer.LogEntry;
 import com.comze_instancelabs.minigamesapi.Arena;
 import com.comze_instancelabs.minigamesapi.ArenaSetup;
 import com.comze_instancelabs.minigamesapi.ArenaState;
@@ -97,21 +105,33 @@ public class Main extends JavaPlugin implements Listener {
             IPlayer ip = a.getPlayers().get(event.getPlayer());
             if(a.getArenaState() == ArenaState.INGAME){
                 for (Team team : a.teams) {
+                    //Joueur entrant dans une base ennemie.
+                    if(BoundsUtil.isInArea(event.getTo(), team.getBase().getBounds()) && ip.getTeam() != team){
+                        ip.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', im.not_allowed_enter_in_base.replace("<team>", team.getChatColoredName())));
+                        event.setCancelled(true);
+                    }
                     if(BoundsUtil.isInArea(event.getTo(), team.getBase().getBounds()) && ip.getTeam() != team){
                         ip.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', im.not_allowed_enter_in_base.replace("<team>", team.getChatColoredName())));
                         event.setCancelled(true);
                     }
                 }
             }
+            if(BoundsUtil.isInCuboid(ip.getPlayer().getLocation(), a.getCenter())){
+            }
         }
     }
 
-    /*
     @EventHandler
     public void onBreak(BlockBreakEvent event){
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
             IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
-            IPlayer ip = a.getPlayers().get(event.getPlayer());
+            
+            //On interdit la destruction d'un bloc dans le centre d'une aréne
+            if(BoundsUtil.isInCuboid(event.getBlock().getLocation(), a.getCenter())){
+                    event.setCancelled(true);
+            }
+            
+            /*
             if(a.getArenaState() == ArenaState.INGAME && event.getBlock().getType() == Material.DIAMOND_ORE){
                 Collection<ItemStack> drops = event.getBlock().getDrops();
                 for (ItemStack itemStack : drops) {
@@ -121,11 +141,11 @@ public class Main extends JavaPlugin implements Listener {
                         System.out.println(event.getPlayer().getName() + " has break diamond ore which drops " + itemStack.getAmount());
                         System.out.println(event.getPlayer().getName() + " has " + ip.getDiamondsMined() + " diamonds");
                     }
-                }
+
             }
+            */
         }
     }
-    */
     
     @EventHandler
     //Clic du joueur dans le menu
@@ -144,18 +164,46 @@ public class Main extends JavaPlugin implements Listener {
                     event.setCancelled(true);
                 }
             }
-            //Arenastate = INGAME
+            //Aréne en état de jeu
             else{
                 //Toute interaction avec un block
                 if(event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction()==Action.LEFT_CLICK_BLOCK){
                     for (Team team : ia.teams) {
-                        //block se trouvant dans une base ennemie
+                        //bloc se trouvant dans une base ennemie
                         if(BoundsUtil.isInArea(event.getClickedBlock().getLocation(), team.getBase().getBounds()) && ip.getTeam() != team){
                             event.setCancelled(true);
+                        } 
+                        //bloc se trouvant dans le depot d'une autre team.
+                        else if(BoundsUtil.isInCuboid(event.getClickedBlock().getLocation(), team.getDepot().getBounds()) && ip.getTeam() != team){
+                            event.setCancelled(true);  
                         }
                     }
                 }
             }
         }
+    }
+    
+    //Une entité qui subit des dégats
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event){
+        
+        if(event.getEntity() instanceof Player){
+            IPlayer ip = (IPlayer) event.getEntity();
+            IArena ia = (IArena) pli.global_players.get(ip.getPlayer().getName());
+            //Aréne en jeu
+            if(ia.getArenaState() == ArenaState.INGAME){
+                //Le joueur se trouve dans le centre de l'aréne
+                if(BoundsUtil.isInCuboid(ip.getPlayer().getLocation(), ia.getCenter())){
+                    event.setCancelled(true);
+                }
+                //Le joueur se trouve dans sa propre base
+                else if(BoundsUtil.isInCuboid(ip.getPlayer().getLocation(), ip.getTeam().getBase().getBounds())){
+                    event.setCancelled(true);
+                }
+            }
+            else{
+                event.setCancelled(true);
+            }
+        }
+       
     }
 }

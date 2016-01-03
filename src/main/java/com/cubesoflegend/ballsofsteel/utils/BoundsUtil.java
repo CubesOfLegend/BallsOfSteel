@@ -4,6 +4,9 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import com.comze_instancelabs.minigamesapi.util.Cuboid;
+import com.cubesoflegend.ballsofsteel.IArena;
+import com.cubesoflegend.ballsofsteel.IPlayer;
+import com.cubesoflegend.ballsofsteel.model.Team;
 
 public class BoundsUtil {
     public static void addBounds(char lowOrHigh,Location loc, FileConfiguration config, String base){
@@ -21,11 +24,35 @@ public class BoundsUtil {
         config.set( base + "z", loc.getBlockZ());
     }
     
-    public static void isInCuboid(Location loc, Cuboid cub){
+    public static boolean isInEnnemyBase(IArena ia, IPlayer player){
+        for (Team team : ia.getTeams()) {
+            if(isInCuboid(player.getPlayer().getLocation(), team.getBase().getBounds()) && player.getTeam() != team){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean isInCuboid(Location loc, Cuboid cub){
+        
+        return isInArea(loc, cub) && loc.getY() >= cub.getLowLoc().getBlockY() && loc.getY() <= cub.getHighLoc().getBlockY();
     }
     
     public static boolean isInArea(Location loc, Cuboid cub){
-        return loc.getX()>=cub.getLowLoc().getBlockX() && loc.getX()<=cub.getHighLoc().getBlockX() && loc.getZ()>=cub.getLowLoc().getBlockZ() && loc.getZ()<=cub.getHighLoc().getBlockZ();
+        
+        int lowX = cub.getLowLoc().getBlockX();
+        int highX = cub.getHighLoc().getBlockX();
+        
+        int maxX = Math.max(lowX, highX);
+        int minX = Math.min(lowX, highX);
+        
+        int lowZ = cub.getLowLoc().getBlockZ();
+        int highZ = cub.getHighLoc().getBlockZ();
+        
+        int maxZ = Math.max(lowZ, highZ);
+        int minZ = Math.min(lowZ, highZ);
+        
+        return loc.getX()>=minX && loc.getX() <= maxX && loc.getZ() >= minZ && loc.getZ() <= maxZ;
     }
 
 }

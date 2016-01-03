@@ -16,7 +16,6 @@ import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.commands.CommandHandler;
 import com.comze_instancelabs.minigamesapi.config.ArenasConfig;
 import com.comze_instancelabs.minigamesapi.util.Util;
-import com.cubesoflegend.ballsofsteel.utils.BoundsUtil;
 import com.cubesoflegend.ballsofsteel.utils.ColorUtils;
 import com.cubesoflegend.ballsofsteel.utils.Validator;
 

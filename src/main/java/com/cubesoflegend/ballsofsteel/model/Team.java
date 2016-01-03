@@ -12,11 +12,13 @@ public class Team {
     private ArrayList<IPlayer> players;
     private String name;
     private Base base;
+    private Depot depot;
 
-    public Team(String name, Base spawn) {
+    public Team(String name, Base spawn, Depot depot) {
         this.players = new ArrayList<IPlayer>();
         this.name = name;
         this.base = spawn;
+        this.depot = depot;
     }
 
     public ArrayList<IPlayer> getPlayers() {
@@ -63,6 +65,14 @@ public class Team {
 
     public void setBase(Base base) {
         this.base = base;
+    }
+    
+    public Depot getDepot(){
+        return this.depot;
+    }
+    
+    public void setDepot(Depot depot){
+        this.depot = depot;
     }
     
     public void teleportTeam(Location location){
