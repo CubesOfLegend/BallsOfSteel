@@ -23,9 +23,11 @@ import com.comze_instancelabs.minigamesapi.util.Cuboid;
 import com.comze_instancelabs.minigamesapi.util.Util;
 import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
 import com.cubesoflegend.ballsofsteel.model.Base;
+import com.cubesoflegend.ballsofsteel.model.Depot;
 import com.cubesoflegend.ballsofsteel.model.Team;
 
 public class IArena extends Arena {
+    
     public Main m;
     ArrayList<Team> teams;
     MinigamesAPI api;
@@ -33,6 +35,7 @@ public class IArena extends Arena {
     ArrayList<Base> spawns;
     HashMap<Player, IPlayer> players;
     private TeamSelectorGui teamgui;
+    private Cuboid center;
 
     /**
      * Constructor IArena
@@ -53,6 +56,10 @@ public class IArena extends Arena {
         if (config.isSet("arenas." + name + ".spawns.spawn0")) {
             ConfigurationSection spawnConfig;
             Set<String> spawnnames = config.getConfigurationSection("arenas." + name + ".spawns").getKeys(false);
+            //Récupération des données de l'aréne
+            Location lowCenterArena = Util.getComponentForArena(m, name, "center.bounds.low");
+            Location highCenterArena = Util.getComponentForArena(m, name, "center.bounds.high");
+            this.center = new Cuboid(lowCenterArena, highCenterArena);
             // Boucle sur les noms de spawns
             for (String spawnname : spawnnames) {
                 if (!spawnname.replace("spawn", "").equalsIgnoreCase("0")) {
@@ -64,7 +71,11 @@ public class IArena extends Arena {
                     Location highSpawnBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".bounds.high");
                     spawn.setBounds(new Cuboid(lowSpawnBound, highSpawnBound));
                     spawns.add(spawn);
-                    Team team = new Team(spawnname.replace("spawn", ""), spawn);
+                    
+                    Location lowDepotBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".depot.bounds.low");
+                    Location highDepotBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".depot.bounds.low");
+                    Depot depot = new Depot(new Cuboid(lowDepotBound, highDepotBound));
+                    Team team = new Team(spawnname.replace("spawn", ""), spawn, depot);
                     teams.add(team);
                 }
             }
@@ -97,6 +108,14 @@ public class IArena extends Arena {
      */
     public TeamSelectorGui getTeamSelectorGui() {
         return this.teamgui;
+    }
+    
+    /**
+     * Return arena center
+     * @return Cuboid
+     */
+    public Cuboid getCenter(){
+        return this.center;
     }
     
     //Listeners
