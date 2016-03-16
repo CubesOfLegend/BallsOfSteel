@@ -1,6 +1,16 @@
 # BallsOfSteel
 ###### Plugin BallsOfSteel basé sur MinigamesLib
 
+### Fonctionnalités :
+
+En plus des [fonctionnalités](https://github.com/instance01/MinigamesAPI/wiki/Default-Sub-Commands) proposées par MinigamesLib
+
+- Gérer les équipes par couleur
+- Gérer le nombre de joueurs par équipe
+- Délimiter la base de chaque équipe (pvp + build + accès désactivé pour les bases ennemies)
+- Délimiter la zone de dépot de chaque équipe (pvp et build désactivé)
+- Délimiter le centre de la carte (pvp et build désactivé)
+
 ### Commandes :
   Commande principale :
   ```
