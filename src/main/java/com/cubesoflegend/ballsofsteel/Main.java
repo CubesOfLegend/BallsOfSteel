@@ -3,6 +3,7 @@ package com.cubesoflegend.ballsofsteel;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.sound.midi.Synthesizer;
 import javax.swing.plaf.BorderUIResource.MatteBorderUIResource;
 
 import org.bukkit.Bukkit;
@@ -150,6 +151,7 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler
     //Clic du joueur dans le menu
     public void onInteract(final PlayerInteractEvent event) {
+        System.out.println("On interact");
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
             IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
             IPlayer ip = ia.getPlayers().get(event.getPlayer());
@@ -168,14 +170,20 @@ public class Main extends JavaPlugin implements Listener {
             else{
                 //Toute interaction avec un block
                 if(event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction()==Action.LEFT_CLICK_BLOCK){
+
                     for (Team team : ia.teams) {
                         //bloc se trouvant dans une base ennemie
                         if(BoundsUtil.isInArea(event.getClickedBlock().getLocation(), team.getBase().getBounds()) && ip.getTeam() != team){
                             event.setCancelled(true);
                         } 
-                        //bloc se trouvant dans le depot d'une autre team.
-                        else if(BoundsUtil.isInCuboid(event.getClickedBlock().getLocation(), team.getDepot().getBounds()) && ip.getTeam() != team){
-                            event.setCancelled(true);  
+                        else if(BoundsUtil.isInCuboid(event.getClickedBlock().getLocation(), team.getDepot().getBounds())){
+                            //bloc se trouvant dans le depot d'une autre team
+                            if(ip.getTeam() != team){
+                                event.setCancelled(true);
+                            //bloc se trouvant dans le depot de sa propre base    
+                            } else {
+                                
+                            }
                         }
                     }
                 }

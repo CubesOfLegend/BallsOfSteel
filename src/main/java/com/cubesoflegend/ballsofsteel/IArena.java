@@ -73,7 +73,7 @@ public class IArena extends Arena {
                     spawns.add(spawn);
                     
                     Location lowDepotBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".depot.bounds.low");
-                    Location highDepotBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".depot.bounds.low");
+                    Location highDepotBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".depot.bounds.high");
                     Depot depot = new Depot(new Cuboid(lowDepotBound, highDepotBound));
                     Team team = new Team(spawnname.replace("spawn", ""), spawn, depot);
                     teams.add(team);
@@ -179,6 +179,12 @@ public class IArena extends Arena {
         teams.get(teams.indexOf(team)).addPlayer(player);
         players.get(p).setTeam(team);
         m.lobbyScoreBoard.updateScoreboard(m, this);
+    }
+    
+    @Override
+    public void stop() {
+        //TODO get all the depot and count the number of diamonds into.
+        super.stop();
     }
     
     

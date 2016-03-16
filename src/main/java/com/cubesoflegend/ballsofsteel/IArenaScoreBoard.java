@@ -74,6 +74,7 @@ public class IArenaScoreBoard extends ArenaScoreboard {
             p.setScoreboard(ascore.get(arena.getName()));
         }
         */
+        
     }
 
     @Override
