@@ -18,6 +18,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockCanBuildEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -111,13 +113,7 @@ public class Main extends JavaPlugin implements Listener {
                         ip.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', im.not_allowed_enter_in_base.replace("<team>", team.getChatColoredName())));
                         event.setCancelled(true);
                     }
-                    if(BoundsUtil.isInArea(event.getTo(), team.getBase().getBounds()) && ip.getTeam() != team){
-                        ip.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', im.not_allowed_enter_in_base.replace("<team>", team.getChatColoredName())));
-                        event.setCancelled(true);
-                    }
                 }
-            }
-            if(BoundsUtil.isInCuboid(ip.getPlayer().getLocation(), a.getCenter())){
             }
         }
     }
@@ -126,12 +122,32 @@ public class Main extends JavaPlugin implements Listener {
     public void onBreak(BlockBreakEvent event){
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
             IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
+            IPlayer ip = a.getPlayers().get(event.getPlayer());
             
-            //On interdit la destruction d'un bloc dans le centre d'une aréne
-            if(BoundsUtil.isInCuboid(event.getBlock().getLocation(), a.getCenter())){
+            if (a.getArenaState() == ArenaState.INGAME) {
+                
+                for (Team team : a.teams) {
+                    //Bloc se trouvant dans une base ennemie.
+                    if(BoundsUtil.isInArea(event.getBlock().getLocation(), team.getBase().getBounds()) && ip.getTeam() != team){
+                        event.setCancelled(true);
+                    //Bloc se trouvant dans le depot ennemi.
+                    } else if (BoundsUtil.isInCuboid(event.getBlock().getLocation(), team.getDepot().getBounds()) && ip.getTeam() != team) {
+                        event.setCancelled(true);
+                    } 
+                }
+
+                //Bloc se trouvant dans le centre de l'arène.
+                if (BoundsUtil.isInCuboid(event.getBlock().getLocation(), a.getCenter())) {
                     event.setCancelled(true);
+                }
+                
+                //Bloc se trouvant à l'extérieur de l'aréne.
+                if (!BoundsUtil.isInCuboid(event.getBlock().getLocation(), a.getBoundaries())){
+                    event.setCancelled(true);
+                }
+
+                
             }
-            
             /*
             if(a.getArenaState() == ArenaState.INGAME && event.getBlock().getType() == Material.DIAMOND_ORE){
                 Collection<ItemStack> drops = event.getBlock().getDrops();
@@ -149,13 +165,43 @@ public class Main extends JavaPlugin implements Listener {
     }
     
     @EventHandler
+    public void onPlace(BlockPlaceEvent event){
+        if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
+            IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
+            IPlayer ip = a.getPlayers().get(event.getPlayer());
+            
+            if (a.getArenaState() == ArenaState.INGAME) {
+                for (Team team : a.teams) {
+                    //Bloc se trouvant dans une base ennemie.
+                    if(BoundsUtil.isInArea(event.getBlock().getLocation(), team.getBase().getBounds()) && ip.getTeam() != team){
+                        event.setCancelled(true);
+                    //Bloc se trouvant dans le depot ennemi.
+                    } else if (BoundsUtil.isInCuboid(event.getBlock().getLocation(), team.getDepot().getBounds()) && ip.getTeam() != team) {
+                        event.setCancelled(true);
+                    } 
+                }
+
+                //Bloc se trouvant dans le centre de l'arène.
+                if (BoundsUtil.isInCuboid(event.getBlock().getLocation(), a.getCenter())) {
+                    event.setCancelled(true);
+                }
+                
+                //Bloc se trouvant à l'extérieur de l'aréne.
+                if (!BoundsUtil.isInCuboid(event.getBlock().getLocation(), a.getBoundaries())){
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
+    
+    @EventHandler
     //Clic du joueur dans le menu
     public void onInteract(final PlayerInteractEvent event) {
-        System.out.println("On interact");
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
             IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
             IPlayer ip = ia.getPlayers().get(event.getPlayer());
             if (ia.getArenaState() != ArenaState.INGAME) {
+                
                 //Open teamselector
                 if(!ia.isArcadeMain() && !ia.getIngameCountdownStarted() && event.hasItem() && event.getItem().getType() == Material.WOOL){
                     TeamSelectorGui teamgui = ia.getTeamSelectorGui();
@@ -168,23 +214,20 @@ public class Main extends JavaPlugin implements Listener {
             }
             //Aréne en état de jeu
             else{
-                //Toute interaction avec un block
-                if(event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction()==Action.LEFT_CLICK_BLOCK){
-
+                if (event.getClickedBlock() != null) {
                     for (Team team : ia.teams) {
                         //bloc se trouvant dans une base ennemie
                         if(BoundsUtil.isInArea(event.getClickedBlock().getLocation(), team.getBase().getBounds()) && ip.getTeam() != team){
                             event.setCancelled(true);
                         } 
-                        else if(BoundsUtil.isInCuboid(event.getClickedBlock().getLocation(), team.getDepot().getBounds())){
-                            //bloc se trouvant dans le depot d'une autre team
-                            if(ip.getTeam() != team){
-                                event.setCancelled(true);
-                            //bloc se trouvant dans le depot de sa propre base    
-                            } else {
-                                
-                            }
+                        else if(BoundsUtil.isInCuboid(event.getClickedBlock().getLocation(), team.getDepot().getBounds()) && ip.getTeam() != team){
+                            event.setCancelled(true);
                         }
+                    }
+                    
+                    //Bloc se trouvant à l'extérieur de l'aréne.
+                    if (!BoundsUtil.isInCuboid(event.getClickedBlock().getLocation(), ia.getBoundaries())){
+                        event.setCancelled(true);
                     }
                 }
             }
@@ -208,10 +251,6 @@ public class Main extends JavaPlugin implements Listener {
                     event.setCancelled(true);
                 }
             }
-            else{
-                event.setCancelled(true);
-            }
         }
-       
     }
 }

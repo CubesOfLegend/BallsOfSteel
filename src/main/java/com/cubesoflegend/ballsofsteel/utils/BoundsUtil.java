@@ -34,8 +34,8 @@ public class BoundsUtil {
     }
     
     public static boolean isInCuboid(Location loc, Cuboid cub){
-        
-        return isInArea(loc, cub) && loc.getY() >= cub.getLowLoc().getBlockY() && loc.getY() <= cub.getHighLoc().getBlockY();
+        //Incrementation de 1 pour eviter le decalage de 1 de hauteur.
+        return isInArea(loc, cub) && loc.getY() + 1 >= cub.getLowLoc().getBlockY() && loc.getY() + 1 <= cub.getHighLoc().getBlockY();
     }
     
     public static boolean isInArea(Location loc, Cuboid cub){
