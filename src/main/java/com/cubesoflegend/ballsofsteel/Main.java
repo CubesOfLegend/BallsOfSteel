@@ -13,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -197,6 +198,7 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler
     //Clic du joueur dans le menu
     public void onInteract(final PlayerInteractEvent event) {
+        
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
             IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
             IPlayer ip = ia.getPlayers().get(event.getPlayer());

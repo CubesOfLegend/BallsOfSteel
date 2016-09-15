@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.comze_instancelabs.minigamesapi.Arena;
@@ -40,6 +41,7 @@ public class ICommandHandler extends CommandHandler {
         cmddesc.put("setminplayers <arena> <count>", "Sets the min players needed to start to given count.");
         cmddesc.put("setteammaxplayers <arena> <team> <count>", "Sets the max players allowed to join team to given count.");
         cmddesc.put("setteamminplayers <arena> <team> <count>", "Sets the min players needed in team to given count.");
+        cmddesc.put("setitemcollect <arena> <team> [itemid:itemsubid]", "Sets the item to collect for a team in arena (If not specified set item in hand).");
         cmddesc.put("setarenavip <arena> <true/false>", "Sets whether arena needs permission to join.");
         cmddesc.put("removearena <arena>", "Deletes an arena from config.");
         cmddesc.put("removespawn <arena> <count>", "Deletes a spawn from config.");
@@ -157,6 +159,8 @@ public class ICommandHandler extends CommandHandler {
                 return this.setTeamMinPlayers(pli, sender, args, uber_permission, cmd, action, plugin, p);
             } else if (action.equalsIgnoreCase("setteammaxplayers")) {
                 return this.setTeamMaxPlayers(pli, sender, args, uber_permission, cmd, action, plugin, p);
+            } else if (action.equalsIgnoreCase("setitemcollect")) {
+                return this.setItemCollect(pli, sender, args, uber_permission, cmd, action, plugin, p);
             } else if (action.equalsIgnoreCase("help")) {
                 sendHelp(cmd, sender);
             } else if (action.equalsIgnoreCase("list")) {
@@ -428,6 +432,68 @@ public class ICommandHandler extends CommandHandler {
                         + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] <nombre>");
             }
         } else {
+            sender.sendMessage(pli.getMessagesConfig().no_perm);
+        }
+        return true;
+    }
+    
+    public boolean setItemCollect(PluginInstance pli, CommandSender sender, String[] args, String uber_permission, String cmd, String action, JavaPlugin plugin, Player p){
+        
+        if (sender.hasPermission(uber_permission + ".setup")) {
+            
+            ItemStack item = null;
+            String itemId = "";
+            String team = args[2].toLowerCase();
+            
+            if (args.length == 4) {
+                
+                itemId = args[3].toLowerCase();
+                String[] itemParts = itemId.split(":");
+                
+                try {
+                    item = new ItemStack(Integer.parseInt(itemParts[0]), 1, Short.parseShort(itemParts[1]));
+                    
+                } catch (Exception e) {
+                    
+                    itemId = "";
+                    
+                }
+                
+            } else if(args.length == 3) {
+                
+                item = p.getItemInHand();
+                Integer intItemId = item.getTypeId(); 
+                Integer intItemSubId = Short.toUnsignedInt(p.getItemInHand().getDurability());
+                
+                if (intItemId != 0) {
+                    
+                    if (intItemSubId != 0) {
+                        
+                        itemId = intItemId + ":" + intItemSubId;
+                        
+                    } else {
+                        
+                        itemId = intItemId.toString();
+                        
+                    }
+                    
+                }
+            }
+            
+            if (validator.spawnExist(args[1], team) && !itemId.isEmpty()) {
+                
+                ArenasConfig config = MinigamesAPI.getAPI().getPluginInstance(plugin).getArenasConfig();
+                String path = "arenas." + args[1] + ".spawns.spawn" + team + ".itemcollect";
+                config.getConfig().set(path, itemId);
+                config.saveConfig();
+                sender.sendMessage(m.im.successfully_set_team_component.replaceAll("<team>", team).replaceAll("<component>", " item to collect ("+ item.getType().toString() + " " + itemId + ")"));
+                
+            } else {
+                sender.sendMessage("The spawn " + args[2] + " doesn't exists or incorrect item specified.");
+            }
+        } else {
+            
+            sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "-" + ChatColor.DARK_GRAY + "]" + ChatColor.GRAY + " Usage: " + cmd + " " + action + " <arena> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] [itemid:subid]");
             sender.sendMessage(pli.getMessagesConfig().no_perm);
         }
         return true;
