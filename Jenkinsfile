@@ -1,1 +1,3 @@
-git url: "https://github.com/CubesOfLegend/BallsOfSteel.git"
+node {
+  git url: "https://github.com/CubesOfLegend/BallsOfSteel.git"
+}
