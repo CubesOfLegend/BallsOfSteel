@@ -102,8 +102,8 @@ public class Team {
         return this.score;
     }
     
-    public void setScore(Integer score){
-        this.score = score;
+    public void addScore(Integer score){
+        this.score += score;
     }
     
     public ArrayList<Block> getBlocks(){

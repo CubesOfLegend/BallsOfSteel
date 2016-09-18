@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.cubesoflegend</groupId>
     <artifactId>BallsOfSteel</artifactId>
-    <version>0.3.4-dev</version>
+    <version>0.3.6-dev</version>
     <build>
         <plugins>
             <plugin>
@@ -22,9 +22,9 @@
     </properties>
     <repositories>
         <repository>
-            <id>MinigamesAPI-Repo</id>
-            <name>MinigamesAPI Repository</name>
-            <url>http://www.instancedev.com/bukkitdev/MinigamesAPI/maven/</url>
+          <id>MinigamesAPI-Repo</id>
+          <name>MinigamesAPI Repository</name>
+          <url>http://nexus.xworlds.eu/nexus/content/groups/mce/</url>
         </repository>
         <repository>
             <id>spigot-repo</id>
@@ -33,9 +33,9 @@
     </repositories>
     <dependencies>
         <dependency>
-            <groupId>com.comze_instancelabs</groupId>
-            <artifactId>MinigamesLib</artifactId>
-            <version>1.11.0</version>
+           <groupId>com.github.MCE-Plugins</groupId>
+           <artifactId>MinigamesLib</artifactId>
+           <version>1.14.12-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

@@ -66,18 +66,6 @@ public class ICommandHandler extends CommandHandler {
         this.validator = new Validator(this.m.pli);
     }
 
-    public static void sendHelp(String cmd, CommandSender sender) {
-        sender.sendMessage(ChatColor.DARK_GRAY + "------- " + ChatColor.BLUE + "Help" + ChatColor.DARK_GRAY + " -------");
-        for (String k : cmddesc.keySet()) {
-            if (k.length() < 3) {
-                sender.sendMessage("");
-                continue;
-            }
-            String v = cmddesc.get(k);
-            sender.sendMessage(ChatColor.DARK_AQUA + cmd + " " + k + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + v);
-        }
-    }
-
     @Override
     public boolean handleArgs(JavaPlugin plugin, String uber_permission, String cmd, CommandSender sender,
             String args[]) {

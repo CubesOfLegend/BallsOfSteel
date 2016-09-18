@@ -251,10 +251,18 @@ public class Main extends JavaPlugin implements Listener {
                     if (BoundsUtil.isInArea(event.getInventory().getLocation(), ip.getTeam().getDepot().getBounds())) {
                         
                         Inventory inventoryClosed = event.getInventory();
-                        
-                        ArrayList<Block> blocks = ip.getTeam().getBlocks();
-                        
                         Block blockClosed = inventoryClosed.getLocation().getBlock();
+                        
+                        Chest chest = (Chest) blockClosed.getState();
+                        
+                        for (int i = 0; i < chest.getInventory().getContents().length; i++) {
+                            ItemStack itemStack = chest.getInventory().getContents()[i];
+                            ip.getTeam().addScore(itemStack.getAmount());
+                            chest.getInventory().remove(i);
+                            //chest.getBlockInventory().
+                        }
+                        
+                        /*
                         
                         if (!blocks.contains(blockClosed)) {
                             blocks.add(blockClosed);
@@ -272,8 +280,9 @@ public class Main extends JavaPlugin implements Listener {
                             }
                             
                         }
+                        */
                         
-                        ip.getTeam().setScore(score);
+                        
                         m.scoreboard.updateScoreboard(m, ia);
                     }
                 }
