@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.cubesoflegend.ballsofsteel.IPlayer;
@@ -25,6 +23,7 @@ public class Team {
     public Team(String name, Base spawn, Depot depot, ItemStack itemCollect) {
         this.players = new ArrayList<IPlayer>();
         this.blocks = new ArrayList<Block>();
+        this.score = 0;
         this.name = name;
         this.base = spawn;
         this.depot = depot;

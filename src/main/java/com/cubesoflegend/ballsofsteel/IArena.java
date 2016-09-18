@@ -183,8 +183,15 @@ public class IArena extends Arena {
         for (Team team : teams) {
             team.teleportTeam(team.getBase().getLocation());
         }
+        
         super.start(false);
         return;
+    }
+    
+    @Override
+    public void started() {
+        //m.scoreboard.updateScoreboard(m, this);
+        super.started();
     }
     
     public void changePlayerToTeam(Player p, Team team){

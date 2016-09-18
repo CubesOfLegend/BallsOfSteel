@@ -34,6 +34,7 @@ public class IArenaLobbyScoreBoard extends ArenaLobbyScoreboard {
     }
     
     public void updateScoreboard(final JavaPlugin plugin, final IArena arena) {
+        
         if (!arena.getShowScoreboard()) {
             return;
         }
@@ -57,9 +58,12 @@ public class IArenaLobbyScoreBoard extends ArenaLobbyScoreboard {
                         aobjective.get(p__).setDisplaySlot(DisplaySlot.SIDEBAR);
                         aobjective.get(p__).setDisplayName("Teams of : " + pli.getMessagesConfig().scoreboard_lobby_title.replaceAll("<arena>", arena.getInternalName()));
                     }
+                    
                     for (Team team : arena.getTeams()) {
-                        aobjective.get(p__).getScore(Bukkit.getOfflinePlayer(team.getChatColoredName())).setScore(team.getPlayers().size());;;                    }
-                        p.setScoreboard(ascore.get(p__));
+                        aobjective.get(p__).getScore(Bukkit.getOfflinePlayer(team.getChatColoredName())).setScore(team.getPlayers().size());                    
+                    }
+                    
+                    p.setScoreboard(ascore.get(p__));
                 }
             }
         });

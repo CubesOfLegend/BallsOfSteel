@@ -1,6 +1,5 @@
 package com.cubesoflegend.ballsofsteel;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
@@ -9,23 +8,27 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 
 import com.comze_instancelabs.minigamesapi.Arena;
+import com.comze_instancelabs.minigamesapi.MinigamesAPI;
+import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.util.ArenaScoreboard;
+import com.comze_instancelabs.minigamesapi.util.Validator;
 import com.cubesoflegend.ballsofsteel.model.Team;
 
 public class IArenaScoreBoard extends ArenaScoreboard {
     HashMap<String, Scoreboard> ascore = new HashMap<String, Scoreboard>();
     HashMap<String, Objective> aobjective = new HashMap<String, Objective>();
 
-    JavaPlugin plugin = null;
+    PluginInstance pli;
 
-    public IArenaScoreBoard(JavaPlugin plugin) {
-        this.plugin = plugin;
+    public IArenaScoreBoard(PluginInstance pli, JavaPlugin plugin) {
+        super(pli, plugin);
     }
 
-    public void updateScoreboard(final IArena arena) {
+    public void updateScoreboard(final JavaPlugin plugin, final IArena arena) {
+        
+        /*
         ArrayList<Team> teams = arena.getTeams();
         
         if (!ascore.containsKey(arena.getName())) {
@@ -52,6 +55,45 @@ public class IArenaScoreBoard extends ArenaScoreboard {
                 player.setScoreboard(ascore.get(arena.getName()));
             }
         }
+        */
+        
+        if (!arena.getShowScoreboard()) {
+            return;
+        }
+
+        if (pli == null) {
+            pli = MinigamesAPI.getAPI().getPluginInstance(plugin);
+        }
+
+        Bukkit.getScheduler().runTask(MinigamesAPI.getAPI(), new Runnable() {
+            public void run() {
+                for (String p__ : arena.getAllPlayers()) {
+                    
+                    if (!Validator.isPlayerValid(plugin, p__, arena)) {
+                        return;
+                    }
+                    
+                    Player p = Bukkit.getPlayer(p__);
+                    IPlayer ip = arena.getPlayers().get(p__);
+                    
+                    if (!ascore.containsKey(p__)) {
+                        ascore.put(p__, Bukkit.getScoreboardManager().getNewScoreboard());
+                    }
+                    if (!aobjective.containsKey(p__)) {
+                        aobjective.put(p__, ascore.get(p__).registerNewObjective(p__, "dummy"));
+                        aobjective.get(p__).setDisplaySlot(DisplaySlot.SIDEBAR);
+                        aobjective.get(p__).setDisplayName("Teams of : " + pli.getMessagesConfig().scoreboard_lobby_title.replaceAll("<arena>", arena.getInternalName()));
+                    }
+                    
+                    for (Team team : arena.getTeams()) {
+                        aobjective.get(p__).getScore(Bukkit.getOfflinePlayer(team.getChatColoredName())).setScore(team.getScore());
+                    }
+                    
+                    p.setScoreboard(ascore.get(p__));
+                }
+            }
+        });
+        
         /*
         for (String p_ : arena.getAllPlayers()) {
             Player p = Bukkit.getPlayer(p_);
@@ -79,15 +121,12 @@ public class IArenaScoreBoard extends ArenaScoreboard {
 
     @Override
     public void updateScoreboard(JavaPlugin plugin, final Arena arena) {
-        //IArena a = (IArena) MinigamesAPI.getAPI().pinstances.get(plugin).getArenaByName(arena.getName());
-        //this.updateScoreboard(a);
+        IArena a = (IArena) MinigamesAPI.getAPI().pinstances.get(plugin).getArenaByName(arena.getName());
+        this.updateScoreboard(plugin ,a);
     }
 
     @Override
     public void removeScoreboard(String arena, Player p) {
-        ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard sc = manager.getNewScoreboard();
-        sc.clearSlot(DisplaySlot.SIDEBAR);
-        p.setScoreboard(sc);
+        super.removeScoreboard(arena, p);
     }
 }

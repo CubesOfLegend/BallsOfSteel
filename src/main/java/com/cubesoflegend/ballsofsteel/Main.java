@@ -1,16 +1,12 @@
 package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.xml.ws.Holder;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.block.DoubleChest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,10 +17,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -66,7 +59,7 @@ public class Main extends JavaPlugin implements Listener {
         PluginInstance pinstance = api.pinstances.get(this);
         pinstance.addLoadedArenas(loadArenas(this, pinstance.getArenasConfig()));
         Bukkit.getPluginManager().registerEvents(this, this);
-        scoreboard = new IArenaScoreBoard(this);
+        scoreboard = new IArenaScoreBoard(pinstance, this);
         lobbyScoreBoard = new IArenaLobbyScoreBoard(pinstance, this);
         pinstance.scoreboardLobbyManager = lobbyScoreBoard;
         pinstance.scoreboardManager = scoreboard;
@@ -145,22 +138,7 @@ public class Main extends JavaPlugin implements Listener {
                 if (!BoundsUtil.isInCuboid(event.getBlock().getLocation(), a.getBoundaries())){
                     event.setCancelled(true);
                 }
-
-                
             }
-            /*
-            if(a.getArenaState() == ArenaState.INGAME && event.getBlock().getType() == Material.DIAMOND_ORE){
-                Collection<ItemStack> drops = event.getBlock().getDrops();
-                for (ItemStack itemStack : drops) {
-                    if(itemStack.getType() == Material.DIAMOND){
-                        ip.setDiamondsMined(ip.getDiamondsMined() + itemStack.getAmount());
-                        //Get amount envoie toujours 1...
-                        System.out.println(event.getPlayer().getName() + " has break diamond ore which drops " + itemStack.getAmount());
-                        System.out.println(event.getPlayer().getName() + " has " + ip.getDiamondsMined() + " diamonds");
-                    }
-
-            }
-            */
         }
     }
     
@@ -296,7 +274,7 @@ public class Main extends JavaPlugin implements Listener {
                         }
                         
                         ip.getTeam().setScore(score);
-                            
+                        m.scoreboard.updateScoreboard(m, ia);
                     }
                 }
                 
