@@ -1,37 +1,37 @@
 package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 
-import javax.sound.midi.Synthesizer;
-import javax.swing.plaf.BorderUIResource.MatteBorderUIResource;
+import javax.xml.ws.Holder;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Chest;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.omg.CORBA.Bounds;
 
-import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer.LogEntry;
 import com.comze_instancelabs.minigamesapi.Arena;
 import com.comze_instancelabs.minigamesapi.ArenaSetup;
 import com.comze_instancelabs.minigamesapi.ArenaState;
@@ -45,7 +45,6 @@ import com.comze_instancelabs.minigamesapi.util.Util;
 import com.comze_instancelabs.minigamesapi.util.Validator;
 import com.cubesoflegend.ballsofsteel.config.IMessagesConfig;
 import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
-import com.cubesoflegend.ballsofsteel.model.Base;
 import com.cubesoflegend.ballsofsteel.model.Team;
 import com.cubesoflegend.ballsofsteel.utils.BoundsUtil;
 
@@ -236,10 +235,11 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
     
-    //Une entité qui subit des dégats
+    @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event){
-        
+        //TODO fix errror CraftPlayer cannot be cast to IPlayer 
         if(event.getEntity() instanceof Player){
+            /*
             IPlayer ip = (IPlayer) event.getEntity();
             IArena ia = (IArena) pli.global_players.get(ip.getPlayer().getName());
             //Aréne en jeu
@@ -253,6 +253,56 @@ public class Main extends JavaPlugin implements Listener {
                     event.setCancelled(true);
                 }
             }
+            */
+        }
+    }
+    
+    @EventHandler
+    public void onInventoryCloseEvent(InventoryCloseEvent event){
+        
+        if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
+            
+            IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
+            IPlayer ip = ia.getPlayers().get(event.getPlayer());
+            
+            if (ia.getArenaState() == ArenaState.INGAME) {
+                
+                if (event.getInventory().getType().equals(InventoryType.CHEST)) {
+                    
+                    
+                    if (BoundsUtil.isInArea(event.getInventory().getLocation(), ip.getTeam().getDepot().getBounds())) {
+                        
+                        Inventory inventoryClosed = event.getInventory();
+                        
+                        ArrayList<Block> blocks = ip.getTeam().getBlocks();
+                        
+                        Block blockClosed = inventoryClosed.getLocation().getBlock();
+                        
+                        if (!blocks.contains(blockClosed)) {
+                            blocks.add(blockClosed);
+                        }
+                        
+                        Integer score = 0;
+                        for (Block block : blocks) {
+                            
+                            Chest chest = (Chest) block.getState();
+                            
+                            for (ItemStack itemStack : chest.getInventory().getContents()) {
+                                if (ip.getTeam().getItemCollect().isSimilar(itemStack)) {
+                                    score += itemStack.getAmount();
+                                }
+                            }
+                            
+                        }
+                        
+                        ip.getTeam().setScore(score);
+                            
+                    }
+                }
+                
+            }
         }
     }
 }
+
+

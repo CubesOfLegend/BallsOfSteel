@@ -69,13 +69,30 @@ public class IArena extends Arena {
                     Base spawn = new Base(spawnname, spawnLoc);
                     Location lowSpawnBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".bounds.low");
                     Location highSpawnBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".bounds.high");
+                    String strItemCollect = config.getString("arenas." + name + ".spawns."+spawnname+".itemcollect");
+                    
+                    ItemStack itemCollect = null;
+                    if (strItemCollect != null) {
+                        
+                        String[] itemCollectParts = strItemCollect.split(":");
+                        
+                        if (itemCollectParts.length>1) {
+                             itemCollect = new ItemStack(Integer.parseInt(itemCollectParts[0]), 1, Short.parseShort(itemCollectParts[1]));
+                        } else {
+                             itemCollect = new ItemStack(Integer.parseInt(itemCollectParts[0]), 1);
+                        }
+                        
+                    }
+                    
+                    
                     spawn.setBounds(new Cuboid(lowSpawnBound, highSpawnBound));
                     spawns.add(spawn);
                     
                     Location lowDepotBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".depot.bounds.low");
                     Location highDepotBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".depot.bounds.high");
                     Depot depot = new Depot(new Cuboid(lowDepotBound, highDepotBound));
-                    Team team = new Team(spawnname.replace("spawn", ""), spawn, depot);
+                    Team team = new Team(spawnname.replace("spawn", ""), spawn, depot, itemCollect);
+                    
                     teams.add(team);
                 }
             }

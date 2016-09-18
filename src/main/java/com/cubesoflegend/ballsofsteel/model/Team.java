@@ -4,21 +4,31 @@ import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import com.cubesoflegend.ballsofsteel.IPlayer;
 import com.cubesoflegend.ballsofsteel.utils.ColorUtils;
 
 public class Team {
+    
     private ArrayList<IPlayer> players;
+    private ArrayList<Block> blocks;
     private String name;
     private Base base;
     private Depot depot;
+    private ItemStack itemCollect;
+    private Integer score;
 
-    public Team(String name, Base spawn, Depot depot) {
+    public Team(String name, Base spawn, Depot depot, ItemStack itemCollect) {
         this.players = new ArrayList<IPlayer>();
+        this.blocks = new ArrayList<Block>();
         this.name = name;
         this.base = spawn;
         this.depot = depot;
+        this.itemCollect = itemCollect;
     }
 
     public ArrayList<IPlayer> getPlayers() {
@@ -79,6 +89,30 @@ public class Team {
         for (IPlayer player : players) {
             player.getPlayer().teleport(location);
         }
+    }
+    
+    public void setItemCollect(ItemStack itemStack){
+        this.itemCollect = itemStack;
+    }
+    
+    public ItemStack getItemCollect(){
+        return this.itemCollect;
+    }
+    
+    public Integer getScore(){
+        return this.score;
+    }
+    
+    public void setScore(Integer score){
+        this.score = score;
+    }
+    
+    public ArrayList<Block> getBlocks(){
+        return this.blocks;
+    }
+    
+    public void setBlocks(ArrayList<Block> blocks){
+        this.blocks = blocks;
     }
 
 }
