@@ -1,6 +1,8 @@
 package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -96,6 +98,7 @@ public class Main extends JavaPlugin implements Listener {
     
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event){
+        
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
             IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
             IPlayer ip = a.getPlayers().get(event.getPlayer());
@@ -238,6 +241,7 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler
     public void onInventoryCloseEvent(InventoryCloseEvent event){
         
+        
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
             
             IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
@@ -256,32 +260,21 @@ public class Main extends JavaPlugin implements Listener {
                         Chest chest = (Chest) blockClosed.getState();
                         
                         for (int i = 0; i < chest.getInventory().getContents().length; i++) {
+                            
                             ItemStack itemStack = chest.getInventory().getContents()[i];
-                            ip.getTeam().addScore(itemStack.getAmount());
-                            chest.getInventory().remove(i);
-                            //chest.getBlockInventory().
-                        }
-                        
-                        /*
-                        
-                        if (!blocks.contains(blockClosed)) {
-                            blocks.add(blockClosed);
-                        }
-                        
-                        Integer score = 0;
-                        for (Block block : blocks) {
                             
-                            Chest chest = (Chest) block.getState();
-                            
-                            for (ItemStack itemStack : chest.getInventory().getContents()) {
-                                if (ip.getTeam().getItemCollect().isSimilar(itemStack)) {
-                                    score += itemStack.getAmount();
-                                }
+                            //On a trouvé un itemStack que l'on doit compter, seul problème : on ne peut supprimer un itemStack sans virer les autres de même amount
+                            if (itemStack != null && itemStack.isSimilar(ip.getTeam().getItemCollect())) {
+                                
+                                //On compte alors le nombre d'itemStack strictement egaux dans l'inventaire :
+                                Integer nbItemStack = chest.getInventory().all(itemStack).size();
+                                //On ajoute au score la multiplication du amount et du nombre d'itemn stacks.
+                                ip.getTeam().addScore(itemStack.getAmount() * nbItemStack);
+                                //On peut donc supprimer les items comptés.
+                                chest.getInventory().remove(itemStack);
                             }
                             
                         }
-                        */
-                        
                         
                         m.scoreboard.updateScoreboard(m, ia);
                     }
