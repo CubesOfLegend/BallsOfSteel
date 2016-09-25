@@ -74,7 +74,6 @@ public class IArenaScoreBoard extends ArenaScoreboard {
                     }
                     
                     Player p = Bukkit.getPlayer(p__);
-                    IPlayer ip = arena.getPlayers().get(p__);
                     
                     if (!ascore.containsKey(p__)) {
                         ascore.put(p__, Bukkit.getScoreboardManager().getNewScoreboard());
