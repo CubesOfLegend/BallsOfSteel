@@ -166,6 +166,7 @@ public class IArena extends Arena {
 
     @Override
     public void leavePlayer(String playername, boolean fullLeave) {
+        
         IPlayer ip = players.get(Bukkit.getPlayer(playername));
         m.scoreboard.removeScoreboard(this.getName(), ip.getPlayer());
         players.remove(ip.getPlayer());
@@ -174,17 +175,125 @@ public class IArena extends Arena {
             //On le vire de son équipe
             ip.getTeam().removePlayer(ip);
         }
+        
         super.leavePlayer(playername, fullLeave);
     }
 
     @Override
     public void start(boolean tp) {
-        //On renvoie toutes les teams à leur spawns respectifs
+        
+        //On prend le nombre de joueur que l'on divise par le nombre de team.
+        Integer countPlayersByTeam = Math.floorDiv(players.size(), teams.size());
+        
+        System.out.println("On veut " + countPlayersByTeam + " joueurs par team.");
+        
+        //On prepare la liste des joueurs ayant essayer de rejoindre une team dans le lobby 1.
+        ArrayList<IPlayer> lobbyOne = new ArrayList<>(); 
+        //On prepare la liste des joueurs n'ayant pas choisi de team dans le lobby 2.
+        ArrayList<IPlayer> lobbyTwo = new ArrayList<>();
+        ArrayList<Team> completedTeams = new ArrayList<>();
+        
+        //On recupére les players sans team (LobbyTwo)
+        for (IPlayer ip : players.values()) {
+            if (ip.getTeam() == null) {
+                lobbyTwo.add(ip);
+            }
+        }
+        
+        //On récupére les joueurs qui sont en trop dans chacune des teams.
         for (Team team : teams) {
-            team.teleportTeam(team.getBase().getLocation());
+            
+            System.out.println(" - Team : " + team.getName() + " size = " + team.getPlayers().size());
+            
+            //Joueurs en trop
+            if (team.getPlayers().size() > countPlayersByTeam) {
+                
+                System.out.println(" -- Trop de joueurs");
+                
+                //Nombre de joueur à virer.
+                Integer countPlayersToMove = team.getPlayers().size() - countPlayersByTeam;
+                
+                //Récupération des joueurs en trop que l'on vire.
+                for (int i = 0; i < countPlayersToMove; i++) {
+                    
+                    Integer lastPlayerIndex = team.getPlayers().size() - 1;
+                    
+                    Player p = team.getPlayers().get(lastPlayerIndex).getPlayer();
+                    System.out.println(" --- Moving " + p.getName() + "(" + lastPlayerIndex + ") to lobby one ( was " + team.getName() + ")");
+                    
+                    //Le joueur est déplacé dans un lobby prioritaire.
+                    lobbyOne.add(team.getPlayers().get(lastPlayerIndex));
+                    changePlayerToTeam(p, null);
+                    
+                }
+            }
+            
+        }
+        
+        Integer maxLoop = 0;
+        
+        while (completedTeams.size() != teams.size() && maxLoop < 100) {
+            
+            maxLoop++;
+            
+            //On parcours les teams tant qu'elle ne sont pas complétes.
+            for (Team team : teams) {
+                
+                System.out.println(" - Team : " + team.getName() + " size = " + team.getPlayers().size());
+                
+                if (team.getPlayers().size() < countPlayersByTeam) {
+                    
+                    Integer countPlayersToMove = countPlayersByTeam - team.getPlayers().size();
+                    System.out.println(" -- Team non complete");
+                    
+                    //Récupération du nombre de joueurs qu'il manque.
+                    for (int i = 0; i < countPlayersToMove; i++) {
+                        
+                        Player p;
+                        
+                        if (!lobbyOne.isEmpty()) {
+                            
+                            p = lobbyOne.get(0).getPlayer();
+                            lobbyOne.remove(0);
+                            
+                        } else {
+                            
+                            p = lobbyTwo.get(0).getPlayer();
+                            lobbyTwo.remove(0);
+                            
+                        }
+                        
+                        changePlayerToTeam(p, team);
+                        
+                        System.out.println(" --- Moving " + p.getName() + " to team " + team.getName() + ")");
+                        
+                        
+                    }
+                    
+                //Team compléte
+                } else {
+                    
+                    if (!completedTeams.contains(team)) {
+                        System.out.println("Team " + team.getName() + " is completed !");
+                        completedTeams.add(team);
+                        team.teleportTeam(team.getBase().getLocation());
+                    }
+                }
+            }
+            
+        }
+        
+        //On vire les joueurs restant dans les lobbys.
+        for (IPlayer ip : lobbyOne) {
+            this.leavePlayer(ip.getPlayer().getName(), true);
+        }
+        
+        for (IPlayer ip : lobbyTwo) {
+            this.leavePlayer(ip.getPlayer().getName(), true);
         }
         
         super.start(false);
+        
         return;
     }
     
@@ -195,14 +304,29 @@ public class IArena extends Arena {
     }
     
     public void changePlayerToTeam(Player p, Team team){
+        
         IPlayer player = players.get(p);
+        
         //Si il a une team on le supprime de sa team
         if(player.getTeam() != null){
             teams.get(teams.indexOf(player.getTeam())).removePlayer(player);
         }
-        teams.get(teams.indexOf(team)).addPlayer(player);
-        players.get(p).setTeam(team);
+        
+        //Aucune team asssignée 
+        if (team == null) {
+            
+            players.get(p).setTeam(null);
+            
+        } else {
+            
+            teams.get(teams.indexOf(team)).addPlayer(player);
+            players.get(p).setTeam(team);
+            
+            
+        }
+        
         m.lobbyScoreBoard.updateScoreboard(m, this);
+        
     }
     
     @Override
@@ -214,6 +338,7 @@ public class IArena extends Arena {
     
     //Dev
     public void verboseArenaData(){
+        
         try {
             if (players.size()!=0) {
                 System.out.println(" Printing players ...");

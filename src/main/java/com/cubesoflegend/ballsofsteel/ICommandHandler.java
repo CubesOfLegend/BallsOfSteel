@@ -198,7 +198,7 @@ public class ICommandHandler extends CommandHandler {
                 }
             }
         } else {
-            sendHelp(cmd, sender);
+            this.sendHelp(cmd, sender);
         }
         return true;
     }
