@@ -28,6 +28,8 @@ public class IArenaScoreBoard extends ArenaScoreboard {
 
     public void updateScoreboard(final JavaPlugin plugin, final IArena arena) {
         
+        System.out.println("Update the scoreboard");
+        
         /*
         ArrayList<Team> teams = arena.getTeams();
         

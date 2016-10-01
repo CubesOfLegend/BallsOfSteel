@@ -25,6 +25,7 @@ public class TeamSelectorGui {
     HashMap<Player, Team> mapPlayerTeam = new HashMap<Player, Team>();
 
     public TeamSelectorGui(PluginInstance pli, Main plugin, ArrayList<Team> teams) {
+        System.out.println("Instanciate TeamSelectorGUI");
         this.pli = pli;
         this.plugin = plugin;
         this.teams = new HashMap<String, Team>();
@@ -34,6 +35,7 @@ public class TeamSelectorGui {
     }
 
     public void openGUI(String playername) {
+        System.out.println("Open GUI (TeamSelectorGUI)");
         IconMenu iconm;
         //Si le joueur a déjà instancié un inconmenu, alors on le récupére si non on en crée un nouveau (Evite doublons)
         if(lasticonm.containsKey(playername)){
@@ -63,6 +65,7 @@ public class TeamSelectorGui {
         int cnt = 0;
         mapOptionTeam = new HashMap<Integer, Team>();
         for (Map.Entry<String, Team> entry : teams.entrySet()) {
+            System.out.println("Looping team");
             Team team = entry.getValue();
             iconm.setOption(cnt, ColorUtils.bimapColorItemStack.get(team.getName()), team.getChatColoredName(), "Choisir l'équipe " + team.getChatColoredName());
             mapOptionTeam.put(cnt, team);

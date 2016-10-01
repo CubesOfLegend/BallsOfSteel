@@ -61,17 +61,17 @@ public class ICommandHandler extends CommandHandler {
             Player p = (Player) sender;
             PluginInstance pli = MinigamesAPI.getAPI().getPluginInstance(plugin);
             String action = args[0];
-            if (action.equalsIgnoreCase("setspawn")) {
+            if (action.equalsIgnoreCase(CommandStrings.SET_SPAWN)) {
                 return this.setSpawn(pli, sender, args, uber_permission, cmd, action, plugin, p);
-            } else if (action.equalsIgnoreCase("removespawn")) {
+            } else if (action.equalsIgnoreCase(CommandStrings.REMOVE_SPAWN)) {
                 return this.removeSpawn(pli, sender, args, uber_permission, cmd, action, plugin, p);
-            } else if (action.equalsIgnoreCase("setteambounds")) {
+            } else if (action.equalsIgnoreCase(CommandStrings.SET_TEAM_BOUNDS)) {
                 return this.setTeamBounds(pli, sender, args, uber_permission, cmd, action, plugin, p);
-            } else if (action.equalsIgnoreCase("setdepotbounds")) {
+            } else if (action.equalsIgnoreCase(CommandStrings.SET_DEPOT_BOUNDS)) {
                 return this.setDepotBounds(pli, sender, args, uber_permission, cmd, action, plugin, p);
-            } else if (action.equalsIgnoreCase("setcenterbounds")) {
+            } else if (action.equalsIgnoreCase(CommandStrings.SET_CENTER_BOUNDS)) {
                 return this.setCenterBounds(pli, sender, args, uber_permission, cmd, action, plugin, p);
-            } else if (action.equalsIgnoreCase("setitemcollect")) {
+            } else if (action.equalsIgnoreCase(CommandStrings.SET_ITEM_COLLECT)) {
                 return this.setItemCollect(pli, sender, args, uber_permission, cmd, action, plugin, p);
             }
         }

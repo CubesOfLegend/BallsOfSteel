@@ -10,17 +10,23 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.comze_instancelabs.minigamesapi.Arena;
+import com.comze_instancelabs.minigamesapi.ArenaConfigStrings;
+import com.comze_instancelabs.minigamesapi.ArenaMessageStrings;
 import com.comze_instancelabs.minigamesapi.MinigamesAPI;
 import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.util.Cuboid;
 import com.comze_instancelabs.minigamesapi.util.Util;
+import com.comze_instancelabs.minigamesapi.util.Validator;
 import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
 import com.cubesoflegend.ballsofsteel.model.Base;
 import com.cubesoflegend.ballsofsteel.model.Depot;
@@ -36,6 +42,21 @@ public class IArena extends Arena {
     HashMap<Player, IPlayer> players;
     private TeamSelectorGui teamgui;
     private Cuboid center;
+    
+    /**
+     * Match statistics: The last damager of players; helps fetching the player that kills another one.
+     */
+    private final HashMap<String, String> lastdamager = new HashMap<>();
+    
+    /**
+     * Match statistics: Kill count of players.
+     */
+    HashMap<String, Integer> temp_kill_count = new HashMap<>();
+    
+    /**
+     * Match statistics: Death count of players.
+     */
+    HashMap<String, Integer> temp_death_count = new HashMap<>();
 
     /**
      * Constructor IArena
@@ -97,8 +118,34 @@ public class IArena extends Arena {
                 }
             }
             if (!teams.isEmpty()) {
+                System.out.println("TeamSelectorGUI instanciate");
                 teamgui = new TeamSelectorGui(pli, m, teams);
             }
+        }
+    }
+    
+    @Override
+    public void spectate(String playername) {
+        
+        if (Validator.isPlayerValid(this.getPlugin(), playername, this))
+        {
+            this.onEliminated(playername);
+            final Player p = Bukkit.getPlayer(playername);
+            if (p == null)
+            {
+                return;
+            }
+            
+            this.pli.global_lost.put(playername, this);
+            
+            this.pli.getSpectatorManager().setSpectate(p, true);
+            if (!this.getPlugin().getConfig().getBoolean(ArenaConfigStrings.CONFIG_SPECTATOR_AFTER_FALL_OR_DEATH))
+            {
+                this.leavePlayer(playername, false, false);
+                this.pli.scoreboardManager.updateScoreboard(this.getPlugin(), this);
+                return;
+            }
+            this.spectateGame(playername);
         }
     }
 
@@ -139,17 +186,23 @@ public class IArena extends Arena {
     @Override
     public void joinPlayerLobby(String playername) {
         
+        System.out.println("Join player Lobby");
+        
         Player p = Bukkit.getPlayer(playername);
         IPlayer ip = new IPlayer(p);
         players.put(p, ip);
 
         // Permet de lancer run() après un certain nombre de ticks serveur
-        Bukkit.getScheduler().runTaskLater(this.getPlugin(), new Runnable() {
+        Bukkit.getScheduler().runTaskLater(m, new Runnable() {
 
             @Override
             public void run() {
                 if (p != null) {
                     if (m.pli.global_players.containsKey(p.getName())) {
+                        
+                        System.out.println("Update the inventory");
+                        
+                        
                         ItemStack teamselector = new ItemStack(Material.WOOL, 1, (byte) 14);
                         ItemMeta itemm = teamselector.getItemMeta();
                         itemm.setDisplayName(ChatColor.RED + "Team");
@@ -326,6 +379,70 @@ public class IArena extends Arena {
         }
         
         m.lobbyScoreBoard.updateScoreboard(m, this);
+        
+    }
+    
+    @Override
+    public void onEliminated(String playername) {
+        
+        System.out.println("On eliminated");
+        
+        if (this.lastdamager.containsKey(playername))
+        {
+            final Player killer = Bukkit.getPlayer(this.lastdamager.get(playername));
+            if (killer != null && !playername.equals(killer.getName()))
+            {
+                this.pli.getStatsInstance().addDeath(playername);
+                this.temp_kill_count.put(killer.getName(), this.temp_kill_count.containsKey(killer.getName()) ? this.temp_kill_count.get(killer.getName()) + 1 : 1);
+                this.temp_death_count.put(playername, this.temp_death_count.containsKey(playername) ? this.temp_death_count.get(playername) + 1 : 1);
+                this.pli.getRewardsInstance().giveKillReward(killer.getName());
+                
+                Player player = Bukkit.getPlayer(playername);
+                IPlayer ip = players.get(player);
+                
+                Inventory inventory = player.getInventory();
+                
+                Integer nbLostItem = 0;
+                for (int i = 0; i < inventory.getContents().length; i++) {
+                    
+                    ItemStack itemStack = inventory.getContents()[i];
+                    
+                    if (itemStack != null && itemStack.isSimilar(ip.getTeam().getItemCollect())) {
+                        
+                        nbLostItem += nbLostItem + itemStack.getAmount();
+                        
+                    }
+                    
+                }
+                
+                
+                Util.sendMessage(this.getPlugin(), killer, pli.getMessagesConfig().you_got_a_kill
+                        .replaceAll(ArenaMessageStrings.PLAYER, playername)
+                        .replaceAll(IArenaMessageStrings.COUNT, nbLostItem.toString())
+                        .replaceAll(IArenaMessageStrings.ITEM, ip.getTeam().getItemCollect().toString())
+                        );
+                
+                for (final String p_ : this.getAllPlayers())
+                {
+                    if (!p_.equalsIgnoreCase(killer.getName()))
+                    {
+                        if (Validator.isPlayerOnline(p_))
+                        {
+                            Bukkit.getPlayer(p_).sendMessage(pli.getMessagesConfig().player_was_killed_by.replaceAll(ArenaMessageStrings.PLAYER, playername)
+                                    .replaceAll(ArenaMessageStrings.KILLER, killer.getName())
+                                    .replaceAll(IArenaMessageStrings.COUNT, nbLostItem.toString())
+                                    .replaceAll(IArenaMessageStrings.ITEM, ip.getTeam().getItemCollect().toString())
+                                    );
+                        }
+                    }
+                }
+            }
+            this.lastdamager.remove(playername);
+        }
+        else
+        {
+            this.pli.getStatsInstance().addDeath(playername);
+        }
         
     }
     

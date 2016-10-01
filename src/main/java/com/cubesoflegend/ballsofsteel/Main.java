@@ -1,8 +1,6 @@
 package com.cubesoflegend.ballsofsteel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
