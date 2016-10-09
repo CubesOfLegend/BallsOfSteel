@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -15,6 +16,7 @@ import com.cubesoflegend.ballsofsteel.Main;
 import com.cubesoflegend.ballsofsteel.config.IMessagesConfig;
 import com.cubesoflegend.ballsofsteel.model.Team;
 import com.cubesoflegend.ballsofsteel.utils.ColorUtils;
+import com.cubesoflegend.ballsofsteel.utils.Debug;
 
 public class TeamSelectorGui {
     PluginInstance pli;
@@ -25,6 +27,10 @@ public class TeamSelectorGui {
     HashMap<Player, Team> mapPlayerTeam = new HashMap<Player, Team>();
 
     public TeamSelectorGui(PluginInstance pli, Main plugin, ArrayList<Team> teams) {
+        
+        StopWatch timer = new StopWatch();
+        timer.start();
+        
         System.out.println("Instanciate TeamSelectorGUI");
         this.pli = pli;
         this.plugin = plugin;
@@ -32,9 +38,16 @@ public class TeamSelectorGui {
         for (Team team : teams) {
             this.teams.put(team.getName(), team);
         }
+        
+        timer.stop();
+        Debug.sendPerf("TeamSelectorGui()", timer.getTime());
     }
 
     public void openGUI(String playername) {
+        
+        StopWatch timer = new StopWatch();
+        timer.start();
+        
         System.out.println("Open GUI (TeamSelectorGUI)");
         IconMenu iconm;
         //Si le joueur a déjà instancié un inconmenu, alors on le récupére si non on en crée un nouveau (Evite doublons)
@@ -46,12 +59,16 @@ public class TeamSelectorGui {
             iconm = new IconMenu("Team", 9, new IconMenu.OptionClickEventHandler() {
                 @Override
                 public void onOptionClick(IconMenu.OptionClickEvent event) {
+                    
+                    StopWatch timer = new StopWatch();
+                    timer.start();
+                    
                     //Permet de prendre le joueur qui a cliqué sur le menu et non tout les autres
                     if(event.getPlayer().getName().equalsIgnoreCase(playername)){
-                        if(pli.global_players.containsKey(playername)){
+                        if(pli.containsGlobalPlayer(playername)){
                             Player p = Bukkit.getPlayer(playername);
                             //global_players contient en fait un hashmap <playername,arena> :o
-                            IArena a = (IArena) pli.global_players.get(playername);
+                            IArena a = (IArena) pli.getArenaByGlobalPlayer(playername);
                             Team team = mapOptionTeam.get(event.getPosition());
                             a.changePlayerToTeam(p, team);
                             IMessagesConfig config = (IMessagesConfig) pli.getMessagesConfig();
@@ -59,6 +76,10 @@ public class TeamSelectorGui {
                         }
                     }
                     event.setWillClose(true);
+                    
+                    timer.stop();
+                    Debug.sendPerf("TeamSelectorGui:OpenGui():onOptionClick()", timer.getTime());
+                    
                 }
             }, plugin);
         }
@@ -73,5 +94,9 @@ public class TeamSelectorGui {
         }
         iconm.open(Bukkit.getPlayerExact(playername));
         lasticonm.put(playername, iconm);
+        
+        timer.stop();
+        Debug.sendPerf("TeamSelectorGui:OpenGui()", timer.getTime());
+        
     }
 }

@@ -5,13 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -31,6 +29,7 @@ import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
 import com.cubesoflegend.ballsofsteel.model.Base;
 import com.cubesoflegend.ballsofsteel.model.Depot;
 import com.cubesoflegend.ballsofsteel.model.Team;
+import com.cubesoflegend.ballsofsteel.utils.Debug;
 
 public class IArena extends Arena {
     
@@ -64,7 +63,12 @@ public class IArena extends Arena {
      * @param String name
      */
     public IArena(Main m, String name) {
+        
         super(m, name);
+        
+        StopWatch timer = new StopWatch();
+        timer.start();
+        
         this.m = m;
         api = MinigamesAPI.getAPI();
         pli = api.getPluginInstance(m);
@@ -75,7 +79,9 @@ public class IArena extends Arena {
         // On récupere la configuration
         FileConfiguration config = pli.getArenasConfig().getConfig();
         if (config.isSet("arenas." + name + ".spawns.spawn0")) {
+            
             ConfigurationSection spawnConfig;
+            
             Set<String> spawnnames = config.getConfigurationSection("arenas." + name + ".spawns").getKeys(false);
             //Récupération des données de l'aréne
             Location lowCenterArena = Util.getComponentForArena(m, name, "center.bounds.low");
@@ -84,8 +90,9 @@ public class IArena extends Arena {
             // Boucle sur les noms de spawns
             for (String spawnname : spawnnames) {
                 if (!spawnname.replace("spawn", "").equalsIgnoreCase("0")) {
+                    
                     spawnConfig = config.getConfigurationSection("arenas." + name + ".spawns." + spawnname);
-                    World world = Bukkit.getWorld(spawnConfig.getString("world"));
+                    
                     Location spawnLoc = Util.getComponentForArena(m, name, "spawns."+spawnname);
                     Base spawn = new Base(spawnname, spawnLoc);
                     Location lowSpawnBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".bounds.low");
@@ -95,13 +102,24 @@ public class IArena extends Arena {
                     ItemStack itemCollect = null;
                     if (strItemCollect != null) {
                         
-                        String[] itemCollectParts = strItemCollect.split(":");
+                        Material material = null;
+                        ItemStack itemStack = null;
                         
-                        if (itemCollectParts.length>1) {
-                             itemCollect = new ItemStack(Integer.parseInt(itemCollectParts[0]), 1, Short.parseShort(itemCollectParts[1]));
+                        if (strItemCollect.contains(":")) {
+                            
+                            String[] itemCollectParts = strItemCollect.split(":");
+                            material = Material.getMaterial(itemCollectParts[0]);
+                            Short itemMetadata = Short.parseShort(itemCollectParts[1]);
+                            itemStack = new ItemStack(material, 1, itemMetadata);
+                            
                         } else {
-                             itemCollect = new ItemStack(Integer.parseInt(itemCollectParts[0]), 1);
+                            
+                            material = Material.getMaterial(strItemCollect);
+                            itemStack = new ItemStack(material, 1);
+                            
                         }
+                        
+                        itemCollect = itemStack;
                         
                     }
                     
@@ -121,6 +139,10 @@ public class IArena extends Arena {
                 System.out.println("TeamSelectorGUI instanciate");
                 teamgui = new TeamSelectorGui(pli, m, teams);
             }
+            
+            timer.stop();
+            Debug.sendPerf("IArena()", timer.getTime());
+            
         }
     }
     
@@ -131,6 +153,7 @@ public class IArena extends Arena {
         {
             this.onEliminated(playername);
             final Player p = Bukkit.getPlayer(playername);
+            
             if (p == null)
             {
                 return;
@@ -186,6 +209,9 @@ public class IArena extends Arena {
     @Override
     public void joinPlayerLobby(String playername) {
         
+        StopWatch timer = new StopWatch();
+        timer.start();
+        
         System.out.println("Join player Lobby");
         
         Player p = Bukkit.getPlayer(playername);
@@ -197,11 +223,14 @@ public class IArena extends Arena {
 
             @Override
             public void run() {
+                
+                StopWatch timer = new StopWatch();
+                timer.start();
+                
                 if (p != null) {
-                    if (m.pli.global_players.containsKey(p.getName())) {
+                    if (m.pli.containsGlobalPlayer(p.getName())) {
                         
                         System.out.println("Update the inventory");
-                        
                         
                         ItemStack teamselector = new ItemStack(Material.WOOL, 1, (byte) 14);
                         ItemMeta itemm = teamselector.getItemMeta();
@@ -211,29 +240,43 @@ public class IArena extends Arena {
                         p.updateInventory();
                     }
                 }
+                
+                timer.stop();
+                Debug.sendPerf("IArena:joinPlayerLobby():run()", timer.getTime());
+                
             }
         }, 25L);
-        super.joinPlayerLobby(playername);
+        
+        super.joinPlayerLobby(p.getUniqueId());
         m.lobbyScoreBoard.updateScoreboard(m, this);
+        
+        timer.stop();
+        Debug.sendPerf("IArena:joinPlayerLobby()", timer.getTime());
+        
+        return;
     }
 
     @Override
-    public void leavePlayer(String playername, boolean fullLeave) {
+    public void leavePlayer(String playername, boolean fullLeave, boolean endOfTheGame) {
         
         IPlayer ip = players.get(Bukkit.getPlayer(playername));
-        m.scoreboard.removeScoreboard(this.getName(), ip.getPlayer());
+        m.scoreboard.removeScoreboard(this.getInternalName(), ip.getPlayer());
         players.remove(ip.getPlayer());
+        
         //Si il est associé à une équipe
         if(ip.getTeam() != null){
             //On le vire de son équipe
             ip.getTeam().removePlayer(ip);
         }
         
-        super.leavePlayer(playername, fullLeave);
+        super.leavePlayer(playername, fullLeave, endOfTheGame);
     }
 
     @Override
     public void start(boolean tp) {
+        
+        StopWatch timer = new StopWatch();
+        timer.start();
         
         //On prend le nombre de joueur que l'on divise par le nombre de team.
         Integer countPlayersByTeam = Math.floorDiv(players.size(), teams.size());
@@ -338,14 +381,17 @@ public class IArena extends Arena {
         
         //On vire les joueurs restant dans les lobbys.
         for (IPlayer ip : lobbyOne) {
-            this.leavePlayer(ip.getPlayer().getName(), true);
+            this.leavePlayer(ip.getPlayer().getName(), true, false);
         }
         
         for (IPlayer ip : lobbyTwo) {
-            this.leavePlayer(ip.getPlayer().getName(), true);
+            this.leavePlayer(ip.getPlayer().getName(), true, false);
         }
         
         super.start(false);
+        
+        timer.stop();
+        Debug.sendPerf("IArena:start()", timer.getTime());
         
         return;
     }

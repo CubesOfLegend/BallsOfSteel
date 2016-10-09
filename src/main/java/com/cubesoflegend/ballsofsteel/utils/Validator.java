@@ -24,7 +24,7 @@ public class Validator {
     
     public boolean isNumeric(String arg){
         try {
-            Integer i = Integer.parseInt(arg);
+            Integer.parseInt(arg);
         } catch (NumberFormatException e) {
             return false;
         }

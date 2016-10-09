@@ -2,6 +2,7 @@ package com.cubesoflegend.ballsofsteel;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -141,7 +142,7 @@ public class ICommandHandler extends CommandHandler {
                 if (validator.isValidTeamArgument(team)) {
 
                     ArenasConfig config = MinigamesAPI.getAPI().getPluginInstance(plugin).getArenasConfig();
-                    boolean ret = false;
+                    
                     String path = "arenas." + args[1] + ".spawns.spawn" + team;
                     if (config.getConfig().isSet(path)) {
                         config.getConfig().set(path, null);
@@ -235,6 +236,7 @@ public class ICommandHandler extends CommandHandler {
         if (sender.hasPermission(uber_permission + ".setup")) {
             if (args.length == 3 && (args[2].equalsIgnoreCase("low") || args[2].equalsIgnoreCase("high"))) {
                 if(args[2].equalsIgnoreCase("low")){
+                    
                     pli.arenaSetup.setBoundaries(plugin, args[1], player.getLocation(), true, "center");
                     sender.sendMessage(m.im.successfully_set.replaceAll("<component>", " low center arena bounds"));
                 }
@@ -258,54 +260,83 @@ public class ICommandHandler extends CommandHandler {
         if (sender.hasPermission(uber_permission + ".setup")) {
             
             ItemStack item = null;
-            String itemId = "";
+            String strItemCollect = "";
+            Material material;
+            
             String team = args[2].toLowerCase();
             
+            //Command with id specfied
             if (args.length == 4) {
                 
-                itemId = args[3].toLowerCase();
-                String[] itemParts = itemId.split(":");
+                strItemCollect = args[3].toLowerCase();
                 
-                try {
-                    item = new ItemStack(Integer.parseInt(itemParts[0]), 1, Short.parseShort(itemParts[1]));
+                if (strItemCollect.contains(":")) {
                     
-                } catch (Exception e) {
+                    String[] itemCollectParts = strItemCollect.split(":");
+                    material = Material.getMaterial(itemCollectParts[0]);
+                    Short itemMetadata = Short.parseShort(itemCollectParts[1]);
+                    item = new ItemStack(material, 1, itemMetadata);
                     
-                    itemId = "";
+                } else {
+                    
+                    material = Material.getMaterial(strItemCollect);
+                    item = new ItemStack(material, 1);
                     
                 }
                 
+                String[] itemParts = strItemCollect.split(":");
+                
+                material = Material.getMaterial(itemParts[0]);
+                
+                System.out.println("@@@@ material:" + material.toString());
+                
+                if (itemParts.length == 1) {
+                    
+                    item = new ItemStack(material, 1);
+                    
+                } else if (itemParts.length == 2) {
+                    
+                    Short itemMetadata = Short.parseShort(itemParts[1]);
+                    System.out.println("@@@@ itemMetadata:" + itemMetadata);
+                    
+                    item = new ItemStack(material, 1, itemMetadata);
+                    
+                } 
+               
+            //Command with item in hand
             } else if(args.length == 3) {
                 
-                item = p.getItemInHand();
-                Integer intItemId = item.getTypeId(); 
-                Integer intItemSubId = Short.toUnsignedInt(p.getItemInHand().getDurability());
+                item = p.getInventory().getItemInMainHand();
+                material = item.getType(); 
+                Integer intItemSubId = Short.toUnsignedInt(item.getDurability());
                 
-                if (intItemId != 0) {
-                    
-                    if (intItemSubId != 0) {
-                        
-                        itemId = intItemId + ":" + intItemSubId;
-                        
-                    } else {
-                        
-                        itemId = intItemId.toString();
-                        
-                    }
-                    
+                if (intItemSubId != 0) {
+                    strItemCollect = material.name() +":"+ intItemSubId.toString();
                 }
+                
             }
             
-            if (validator.spawnExist(args[1], team) && !itemId.isEmpty()) {
+            if (validator.spawnExist(args[1], team)) {
                 
-                ArenasConfig config = MinigamesAPI.getAPI().getPluginInstance(plugin).getArenasConfig();
-                String path = "arenas." + args[1] + ".spawns.spawn" + team + ".itemcollect";
-                config.getConfig().set(path, itemId);
-                config.saveConfig();
-                sender.sendMessage(m.im.successfully_set_team_component.replaceAll("<team>", team).replaceAll("<component>", " item to collect ("+ item.getType().toString() + " " + itemId + ")"));
+                if (item != null) {
+                    
+                    ArenasConfig config = MinigamesAPI.getAPI().getPluginInstance(plugin).getArenasConfig();
+                    String path = "arenas." + args[1] + ".spawns.spawn" + team + ".itemcollect";
+                    config.getConfig().set(path, strItemCollect);
+                    config.saveConfig();
+                    
+                    sender.sendMessage(m.im.successfully_set_team_component.replaceAll("<team>", team).replaceAll("<component>", " item to collect ("+ item.getType().toString() + " " + strItemCollect + ")"));
+                    
+                    
+                } else {
+                    
+                    sender.sendMessage(m.im.failed_set_team_component.replaceAll("<team>", team) + 
+                            m.im.the_item_doesnt_exists.replaceAll("<item>", strItemCollect));
+                    
+                }
                 
             } else {
-                sender.sendMessage("The spawn " + args[2] + " doesn't exists or incorrect item specified.");
+                sender.sendMessage(m.im.team_not_exists.replaceAll("<team>", team));
             }
         } else {
             

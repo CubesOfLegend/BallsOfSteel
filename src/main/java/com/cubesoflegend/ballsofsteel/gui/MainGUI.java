@@ -13,7 +13,7 @@ public class MainGUI {
 
     public MainGUI(PluginInstance pli, Player p) {
         System.out.println("Main GUI");
-        if (pli.global_players.containsKey(p.getName())) {
+        if (pli.containsGlobalPlayer(p.getName())) {
             ItemStack teamselector = new ItemStack(Material.WOOL, 1, (byte) 14);
             ItemMeta itemm = teamselector.getItemMeta();
             itemm.setDisplayName(ChatColor.RED + "Team");

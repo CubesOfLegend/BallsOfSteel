@@ -1,7 +1,9 @@
 package com.cubesoflegend.ballsofsteel;
 
+import java.sql.Time;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -40,6 +42,7 @@ import com.cubesoflegend.ballsofsteel.config.IMessagesConfig;
 import com.cubesoflegend.ballsofsteel.gui.TeamSelectorGui;
 import com.cubesoflegend.ballsofsteel.model.Team;
 import com.cubesoflegend.ballsofsteel.utils.BoundsUtil;
+import com.cubesoflegend.ballsofsteel.utils.Debug;
 
 public class Main extends JavaPlugin implements Listener {
     
@@ -53,11 +56,16 @@ public class Main extends JavaPlugin implements Listener {
     static Main m = null;
 
     public void onEnable() {
+        
+        StopWatch timer = new StopWatch();
+        timer.start();
+        
         m = this;
         this.im = new IMessagesConfig(this);
         api = MinigamesAPI.getAPI().setupAPI(this, "BallsOfSteel", IArena.class, new ArenasConfig(this), im, new ClassesConfig(this, false), new StatsConfig(this, false), new DefaultConfig(this, false), false);
-        PluginInstance pinstance = api.pinstances.get(this);
-        pinstance.addLoadedArenas(loadArenas(this, pinstance.getArenasConfig()));
+        
+        PluginInstance pinstance = api.getPluginInstance(this);
+        pinstance.addArenas(loadArenas(this, pinstance.getArenasConfig()));
         Bukkit.getPluginManager().registerEvents(this, this);
         scoreboard = new IArenaScoreBoard(pinstance, this);
         lobbyScoreBoard = new IArenaLobbyScoreBoard(pinstance, this);
@@ -65,28 +73,41 @@ public class Main extends JavaPlugin implements Listener {
         pinstance.scoreboardManager = scoreboard;
         this.pli = pinstance;
         this.cmdhandler = new ICommandHandler(this);
+        
+        timer.stop();
+        Debug.sendPerf("onEnable()", timer.getTime());
+        timer.reset();
+        
+        
     }
 
     public static ArrayList<Arena> loadArenas(JavaPlugin plugin, ArenasConfig cf) {
+        
         ArrayList<Arena> ret = new ArrayList<Arena>();
         FileConfiguration config = cf.getConfig();
+        
         if (!config.isSet("arenas")) {
             return ret;
         }
+        
         for (String arena : config.getConfigurationSection("arenas.").getKeys(false)) {
             if (Validator.isArenaValid(plugin, arena, cf.getConfig())) {
                 ret.add(initArena(arena));
             }
         }
+        
         return ret;
+        
     }
 
     public static IArena initArena(String arena) {
+        
         IArena a = new IArena(m, arena);
-        ArenaSetup s = MinigamesAPI.getAPI().pinstances.get(m).arenaSetup;
+        ArenaSetup s = MinigamesAPI.getAPI().getPluginInstance(m).arenaSetup;
         a.init(Util.getSignLocationFromArena(m, arena), Util.getAllSpawns(m, arena), Util.getMainLobby(m),
         Util.getComponentForArena(m, arena, "lobby"), s.getPlayerCount(m, arena, true),
         s.getPlayerCount(m, arena, false), s.getArenaVIP(m, arena));
+        
         return a;
     }
 
@@ -98,7 +119,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onPlayerMove(PlayerMoveEvent event){
         
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
-            IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
+            IArena a = (IArena) pli.getArenaByGlobalPlayer(event.getPlayer().getName());
             IPlayer ip = a.getPlayers().get(event.getPlayer());
             if(a.getArenaState() == ArenaState.INGAME){
                 for (Team team : a.teams) {
@@ -115,7 +136,7 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler
     public void onBreak(BlockBreakEvent event){
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
-            IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
+            IArena a = (IArena) pli.getArenaByGlobalPlayer(event.getPlayer().getName());
             IPlayer ip = a.getPlayers().get(event.getPlayer());
             
             if (a.getArenaState() == ArenaState.INGAME) {
@@ -146,7 +167,7 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlace(BlockPlaceEvent event){
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
-            IArena a = (IArena) pli.global_players.get(event.getPlayer().getName());
+            IArena a = (IArena) pli.getArenaByGlobalPlayer(event.getPlayer().getName());
             IPlayer ip = a.getPlayers().get(event.getPlayer());
             
             if (a.getArenaState() == ArenaState.INGAME) {
@@ -178,7 +199,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onInteract(final PlayerInteractEvent event) {
         
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
-            IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
+            IArena ia = (IArena) pli.getArenaByGlobalPlayer(event.getPlayer().getName());
             IPlayer ip = ia.getPlayers().get(event.getPlayer());
             if (ia.getArenaState() != ArenaState.INGAME) {
                 
@@ -242,7 +263,7 @@ public class Main extends JavaPlugin implements Listener {
         
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
             
-            IArena ia = (IArena) pli.global_players.get(event.getPlayer().getName());
+            IArena ia = (IArena) pli.getArenaByGlobalPlayer(event.getPlayer().getName());
             IPlayer ip = ia.getPlayers().get(event.getPlayer());
             
             if (ia.getArenaState() == ArenaState.INGAME) {

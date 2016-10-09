@@ -11,6 +11,8 @@ public class IMessagesConfig extends MessagesConfig {
     public String team_not_exists = "&cThe team <team> does not exists";
     public String possible_teams_are = "&ePossible teams are <teams>";
     public String successfully_set_team_component = "&a Successfully set <component> for team <team>";
+    public String failed_set_team_component = "&c Failed set component for team <team>";
+    public String the_item_doesnt_exists = "&c The item <item> doesn't exist.";
     public String not_allowed_enter_in_base= "&c You're not allowed to enter in <team>&c base";
     
     public IMessagesConfig(JavaPlugin plugin){

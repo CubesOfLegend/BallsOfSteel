@@ -62,6 +62,7 @@ public class IArenaLobbyScoreBoard extends ArenaLobbyScoreboard {
                     if (!ascore.containsKey(p__)) {
                         ascore.put(p__, Bukkit.getScoreboardManager().getNewScoreboard());
                     }
+                    
                     if (!aobjective.containsKey(p__)) {
                         aobjective.put(p__, ascore.get(p__).registerNewObjective(p__, "dummy"));
                         aobjective.get(p__).setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -80,7 +81,7 @@ public class IArenaLobbyScoreBoard extends ArenaLobbyScoreboard {
     
     @Override
     public void updateScoreboard(JavaPlugin plugin, final Arena arena) {
-        IArena a = (IArena) MinigamesAPI.getAPI().pinstances.get(plugin).getArenaByName(arena.getName());
+        IArena a = (IArena) MinigamesAPI.getAPI().getPluginInstance(plugin).getArenaByName(arena.getInternalName());
         this.updateScoreboard(plugin ,a);
     }
     
