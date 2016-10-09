@@ -118,7 +118,12 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event){
         
+        
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
+            
+            StopWatch timer = new StopWatch();
+            timer.start();
+            
             IArena a = (IArena) pli.getArenaByGlobalPlayer(event.getPlayer().getName());
             IPlayer ip = a.getPlayers().get(event.getPlayer());
             if(a.getArenaState() == ArenaState.INGAME){
@@ -130,7 +135,12 @@ public class Main extends JavaPlugin implements Listener {
                     }
                 }
             }
+            
+            timer.stop();
+            Debug.sendPerf("Main:onPlayerMove()", timer.getTime());
         }
+        
+        
     }
 
     @EventHandler
