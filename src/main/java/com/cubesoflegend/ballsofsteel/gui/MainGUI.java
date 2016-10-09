@@ -12,7 +12,7 @@ public class MainGUI {
     PluginInstance pli;
 
     public MainGUI(PluginInstance pli, Player p) {
-        System.out.println("Main GUI");
+        
         if (pli.containsGlobalPlayer(p.getName())) {
             ItemStack teamselector = new ItemStack(Material.WOOL, 1, (byte) 14);
             ItemMeta itemm = teamselector.getItemMeta();
@@ -21,5 +21,6 @@ public class MainGUI {
             p.getInventory().setItem(0, teamselector);
             p.updateInventory();
         }
+        
     }
 }

@@ -35,8 +35,6 @@ public class IArenaLobbyScoreBoard extends ArenaLobbyScoreboard {
     
     public void updateScoreboard(final JavaPlugin plugin, final IArena arena) {
         
-        System.out.println("Update scoreboard");
-        
         if (!arena.getShowScoreboard()) {
             return;
         }
@@ -48,11 +46,7 @@ public class IArenaLobbyScoreBoard extends ArenaLobbyScoreboard {
         Bukkit.getScheduler().runTask(MinigamesAPI.getAPI(), new Runnable() {
             public void run() {
                 
-                System.out.println("Update scoreboard runtask");
-                
                 for (String p__ : arena.getAllPlayers()) {
-                    
-                    System.out.println("All players");
                     
                     if (!Validator.isPlayerValid(plugin, p__, arena)) {
                         return;

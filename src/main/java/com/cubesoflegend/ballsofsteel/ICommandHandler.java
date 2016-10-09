@@ -288,8 +288,6 @@ public class ICommandHandler extends CommandHandler {
                 
                 material = Material.getMaterial(itemParts[0]);
                 
-                System.out.println("@@@@ material:" + material.toString());
-                
                 if (itemParts.length == 1) {
                     
                     item = new ItemStack(material, 1);
@@ -297,7 +295,6 @@ public class ICommandHandler extends CommandHandler {
                 } else if (itemParts.length == 2) {
                     
                     Short itemMetadata = Short.parseShort(itemParts[1]);
-                    System.out.println("@@@@ itemMetadata:" + itemMetadata);
                     
                     item = new ItemStack(material, 1, itemMetadata);
                     

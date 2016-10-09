@@ -112,6 +112,7 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        
         return cmdhandler.handleArgs(this, "bos", "/" + cmd.getName(), sender, args);
     }
     
@@ -120,9 +121,6 @@ public class Main extends JavaPlugin implements Listener {
         
         
         if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
-            
-            StopWatch timer = new StopWatch();
-            timer.start();
             
             IArena a = (IArena) pli.getArenaByGlobalPlayer(event.getPlayer().getName());
             IPlayer ip = a.getPlayers().get(event.getPlayer());
@@ -136,8 +134,6 @@ public class Main extends JavaPlugin implements Listener {
                 }
             }
             
-            timer.stop();
-            Debug.sendPerf("Main:onPlayerMove()", timer.getTime());
         }
         
         
@@ -208,41 +204,55 @@ public class Main extends JavaPlugin implements Listener {
     //Clic du joueur dans le menu
     public void onInteract(final PlayerInteractEvent event) {
         
-        if(pli.containsGlobalPlayer(event.getPlayer().getName()) && !pli.containsGlobalLost(event.getPlayer().getName())){
-            IArena ia = (IArena) pli.getArenaByGlobalPlayer(event.getPlayer().getName());
-            IPlayer ip = ia.getPlayers().get(event.getPlayer());
-            if (ia.getArenaState() != ArenaState.INGAME) {
+            Player p = event.getPlayer();
+            
+            if(pli.containsGlobalPlayer(p.getName())){
                 
-                //Open teamselector
-                if(!ia.isArcadeMain() && !ia.getIngameCountdownStarted() && event.hasItem() && event.getItem().getType() == Material.WOOL){
-                    TeamSelectorGui teamgui = ia.getTeamSelectorGui();
-                    teamgui.openGUI(event.getPlayer().getName());
-                }
-                //Forbid interact with all blocks in arena if arena is not in game
-                if(event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction()==Action.LEFT_CLICK_BLOCK){
-                    event.setCancelled(true);
-                }
-            }
-            //Aréne en état de jeu
-            else{
-                if (event.getClickedBlock() != null) {
-                    for (Team team : ia.teams) {
-                        //bloc se trouvant dans une base ennemie
-                        if(BoundsUtil.isInArea(event.getClickedBlock().getLocation(), team.getBase().getBounds()) && ip.getTeam() != team){
-                            event.setCancelled(true);
-                        } 
-                        else if(BoundsUtil.isInCuboid(event.getClickedBlock().getLocation(), team.getDepot().getBounds()) && ip.getTeam() != team){
+                IArena ia = (IArena) pli.getArenaByGlobalPlayer(event.getPlayer().getName());
+                
+                switch (ia.getArenaState()) {
+                case JOIN:
+                    
+                    if (event.hasItem() && event.getItem().getType() == Material.WOOL) {
+                        
+                        TeamSelectorGui teamgui = ia.getTeamSelectorGui();
+                        teamgui.openGUI(p.getName());
+                        
+                    }
+                    
+                    break;
+                    
+                case INGAME:
+                    
+                    Block block = event.getClickedBlock();
+                    
+                    if (block != null) {
+                        
+                        IPlayer ip = ia.getPlayers().get(p);
+                        
+                        for (Team team : ia.teams) {
+                            //bloc se trouvant dans une base ennemie
+                            if(BoundsUtil.isInArea(block.getLocation(), team.getBase().getBounds()) && ip.getTeam() != team){
+                                event.setCancelled(true);
+                            } 
+                            else if(BoundsUtil.isInCuboid(block.getLocation(), team.getDepot().getBounds()) && ip.getTeam() != team){
+                                event.setCancelled(true);
+                            }
+                        }
+                        
+                        //Bloc se trouvant à l'extérieur de l'aréne.
+                        if (!BoundsUtil.isInCuboid(block.getLocation(), ia.getBoundaries())){
                             event.setCancelled(true);
                         }
                     }
                     
-                    //Bloc se trouvant à l'extérieur de l'aréne.
-                    if (!BoundsUtil.isInCuboid(event.getClickedBlock().getLocation(), ia.getBoundaries())){
-                        event.setCancelled(true);
-                    }
+                    break;
+
+                default:
+                    break;
                 }
+                
             }
-        }
     }
     
     @EventHandler
