@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.bukkit.Bukkit;
@@ -141,7 +143,7 @@ public class IArena extends Arena {
             }
             
             timer.stop();
-            Debug.sendPerf("IArena()", timer.getTime());
+            m.logger.log(Level.INFO, Debug.formatPerf("IArena()", timer.getTime()));
             
         }
     }
@@ -242,7 +244,7 @@ public class IArena extends Arena {
                 }
                 
                 timer.stop();
-                Debug.sendPerf("IArena:joinPlayerLobby():run()", timer.getTime());
+                m.logger.log(Level.INFO, Debug.formatPerf("IArena:joinPlayerLobby():run()", timer.getTime()));
                 
             }
         }, 25L);
@@ -251,7 +253,7 @@ public class IArena extends Arena {
         m.lobbyScoreBoard.updateScoreboard(m, this);
         
         timer.stop();
-        Debug.sendPerf("IArena:joinPlayerLobby()", timer.getTime());
+        m.logger.log(Level.INFO, Debug.formatPerf("IArena:joinPlayerLobby()", timer.getTime()));
         
         return;
     }
@@ -391,7 +393,7 @@ public class IArena extends Arena {
         super.start(false);
         
         timer.stop();
-        Debug.sendPerf("IArena:start()", timer.getTime());
+        m.logger.log(Level.INFO, Debug.formatPerf("IArena:start()", timer.getTime()));
         
         return;
     }

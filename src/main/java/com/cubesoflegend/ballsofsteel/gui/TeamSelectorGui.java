@@ -3,6 +3,8 @@ package com.cubesoflegend.ballsofsteel.gui;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.bukkit.Bukkit;
@@ -25,9 +27,11 @@ public class TeamSelectorGui {
     HashMap<Integer, Team> mapOptionTeam;
     public HashMap<String, IconMenu> lasticonm = new HashMap<String, IconMenu>();
     HashMap<Player, Team> mapPlayerTeam = new HashMap<Player, Team>();
+    Logger logger;
 
     public TeamSelectorGui(PluginInstance pli, Main plugin, ArrayList<Team> teams) {
         
+        logger = plugin.logger;
         StopWatch timer = new StopWatch();
         timer.start();
         
@@ -39,7 +43,7 @@ public class TeamSelectorGui {
         }
         
         timer.stop();
-        Debug.sendPerf("TeamSelectorGui::contruct()", timer.getTime());
+        logger.log(Level.INFO, Debug.formatPerf("TeamSelectorGui::contruct()", timer.getTime()));
     }
 
     public void openGUI(String playername) {
@@ -76,7 +80,7 @@ public class TeamSelectorGui {
                     event.setWillClose(true);
                     
                     timer.stop();
-                    Debug.sendPerf("TeamSelectorGui:OpenGui():onOptionClick()", timer.getTime());
+                    logger.log(Level.INFO, Debug.formatPerf("TeamSelectorGui:OpenGui():onOptionClick()", timer.getTime()));
                     
                 }
             }, plugin);
@@ -95,7 +99,7 @@ public class TeamSelectorGui {
         lasticonm.put(playername, iconm);
         
         timer.stop();
-        Debug.sendPerf("TeamSelectorGui:OpenGui()", timer.getTime());
+        logger.log(Level.INFO, Debug.formatPerf("TeamSelectorGui:OpenGui()", timer.getTime()));
         
     }
 }

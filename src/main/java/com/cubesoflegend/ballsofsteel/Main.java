@@ -1,7 +1,8 @@
 package com.cubesoflegend.ballsofsteel;
 
-import java.sql.Time;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.bukkit.Bukkit;
@@ -15,7 +16,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -54,6 +54,7 @@ public class Main extends JavaPlugin implements Listener {
     public IArenaScoreBoard scoreboard;
     public IArenaLobbyScoreBoard lobbyScoreBoard;
     static Main m = null;
+    public Logger logger = Debug.getLogger();
 
     public void onEnable() {
         
@@ -75,7 +76,7 @@ public class Main extends JavaPlugin implements Listener {
         this.cmdhandler = new ICommandHandler(this);
         
         timer.stop();
-        Debug.sendPerf("onEnable()", timer.getTime());
+        logger.log(Level.INFO, Debug.formatPerf("enabling the plugin", timer.getTime()));
         timer.reset();
         
         
