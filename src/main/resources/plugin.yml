@@ -1,6 +1,6 @@
 name: BallsOfSteel
 main: com.cubesoflegend.ballsofsteel.Main
-version: 0.4.11-dev
+version: 0.4.12-dev
 depend: [MinigamesLib]
 commands:
    bos:
@@ -20,15 +20,6 @@ commands:
       description: Permet de setter les bounds d'une team (Base)
       usage : /bos setteambounds <arene> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] [low/high]
       permission: mgbos.setup
-      permission-message: Vous n'avez pas la permission "mgbos.setup".
-   bos setteamminplayers:
-      description: Permet de setter le nombre minimum de joueurs dans une team
-      usage : /bos setteamminplayers <arene> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] <count>
-      permission: mgbos.setup
-      permission-message: Vous n'avez pas la permission "mgbos.setup".
-   bos setteammaxplayers:
-      description: Permet de setter le nombre maximum de joueurs dans une team
-      usage : /bos setteammaxplayers <arene> [Bleu/Rouge/Jaune/Vert/Rose/Violet/Orange/Noir/Blanc] <count>
       permission-message: Vous n'avez pas la permission "mgbos.setup".
    bos setteamdepot:
       description: Permet de setter les bounds de la zone de depot d'une team

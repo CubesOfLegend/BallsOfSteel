@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.bukkit.Bukkit;
@@ -91,14 +90,21 @@ public class IArena extends Arena {
             this.center = new Cuboid(lowCenterArena, highCenterArena);
             // Boucle sur les noms de spawns
             for (String spawnname : spawnnames) {
+                //Mauvaise pratique mais MinigamesLib oblige à avoir un spawn0 dans la config. Donc on ne charge pas la config du spawn0 qui n'est pas utilisé
                 if (!spawnname.replace("spawn", "").equalsIgnoreCase("0")) {
                     
+                    //TODO A externaliser pour que le constructeur soit plus court
                     spawnConfig = config.getConfigurationSection("arenas." + name + ".spawns." + spawnname);
                     
+                    //Récupération de la base.
                     Location spawnLoc = Util.getComponentForArena(m, name, "spawns."+spawnname);
                     Base spawn = new Base(spawnname, spawnLoc);
                     Location lowSpawnBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".bounds.low");
                     Location highSpawnBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".bounds.high");
+                    spawn.setBounds(new Cuboid(lowSpawnBound, highSpawnBound));
+                    spawns.add(spawn);
+                    
+                    //Récupération de l'item collect
                     String strItemCollect = config.getString("arenas." + name + ".spawns."+spawnname+".itemcollect");
                     
                     ItemStack itemCollect = null;
@@ -125,21 +131,20 @@ public class IArena extends Arena {
                         
                     }
                     
-                    
-                    spawn.setBounds(new Cuboid(lowSpawnBound, highSpawnBound));
-                    spawns.add(spawn);
-                    
+                    //Récupération du dépot.
                     Location lowDepotBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".depot.bounds.low");
                     Location highDepotBound = Util.getComponentForArena(m, name, "spawns."+spawnname+".depot.bounds.high");
                     Depot depot = new Depot(new Cuboid(lowDepotBound, highDepotBound));
+                    
+                    
                     Team team = new Team(spawnname.replace("spawn", ""), spawn, depot, itemCollect);
                     
                     teams.add(team);
                 }
             }
+            
             if (!teams.isEmpty()) {
-                System.out.println("TeamSelectorGUI instanciate");
-                teamgui = new TeamSelectorGui(pli, m, teams);
+                teamgui = new TeamSelectorGui(pli, m, this);
             }
             
             timer.stop();
@@ -220,7 +225,7 @@ public class IArena extends Arena {
         IPlayer ip = new IPlayer(p);
         players.put(p, ip);
 
-        // Permet de lancer run() après un certain nombre de ticks serveur
+        // Tâche lancée après 25 ticks serveurs (Laisse le temps que l'inventory du joueur soit accessible pour afficher l'item.)
         Bukkit.getScheduler().runTaskLater(m, new Runnable() {
 
             @Override
@@ -235,9 +240,9 @@ public class IArena extends Arena {
                         System.out.println("Update the inventory");
                         
                         ItemStack teamselector = new ItemStack(Material.WOOL, 1, (byte) 14);
-                        ItemMeta itemm = teamselector.getItemMeta();
-                        itemm.setDisplayName(ChatColor.RED + "Team");
-                        teamselector.setItemMeta(itemm);
+                        ItemMeta item = teamselector.getItemMeta();
+                        item.setDisplayName(ChatColor.RED + "Team");
+                        teamselector.setItemMeta(item);
                         p.getInventory().setItem(2, teamselector);
                         p.updateInventory();
                     }
@@ -433,7 +438,6 @@ public class IArena extends Arena {
     @Override
     public void onEliminated(String playername) {
         
-        System.out.println("On eliminated");
         
         if (this.lastdamager.containsKey(playername))
         {

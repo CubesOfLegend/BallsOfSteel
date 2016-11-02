@@ -2,7 +2,6 @@ package com.cubesoflegend.ballsofsteel.gui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,13 +22,13 @@ import com.cubesoflegend.ballsofsteel.utils.Debug;
 public class TeamSelectorGui {
     PluginInstance pli;
     Main plugin;
-    HashMap<String, Team> teams;
-    HashMap<Integer, Team> mapOptionTeam;
+    IArena ia;
+    ArrayList<Team> teams;
     public HashMap<String, IconMenu> lasticonm = new HashMap<String, IconMenu>();
     HashMap<Player, Team> mapPlayerTeam = new HashMap<Player, Team>();
     Logger logger;
 
-    public TeamSelectorGui(PluginInstance pli, Main plugin, ArrayList<Team> teams) {
+    public TeamSelectorGui(PluginInstance pli, Main plugin, IArena ia) {
         
         logger = plugin.logger;
         StopWatch timer = new StopWatch();
@@ -37,10 +36,8 @@ public class TeamSelectorGui {
         
         this.pli = pli;
         this.plugin = plugin;
-        this.teams = new HashMap<String, Team>();
-        for (Team team : teams) {
-            this.teams.put(team.getName(), team);
-        }
+        this.ia = ia;
+        this.teams = ia.getTeams();
         
         timer.stop();
         logger.log(Level.INFO, Debug.formatPerf("TeamSelectorGui::contruct()", timer.getTime()));
@@ -68,13 +65,13 @@ public class TeamSelectorGui {
                     //Permet de prendre le joueur qui a cliqué sur le menu et non tout les autres
                     if(event.getPlayer().getName().equalsIgnoreCase(playername)){
                         if(pli.containsGlobalPlayer(playername)){
+                            
                             Player p = Bukkit.getPlayer(playername);
-                            //global_players contient en fait un hashmap <playername,arena> :o
-                            IArena a = (IArena) pli.getArenaByGlobalPlayer(playername);
-                            Team team = mapOptionTeam.get(event.getPosition());
-                            a.changePlayerToTeam(p, team);
+                            Team team = teams.get(event.getPosition());
+                            ia.changePlayerToTeam(p, team);
                             IMessagesConfig config = (IMessagesConfig) pli.getMessagesConfig();
                             p.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', config.you_joined_team.replaceAll("<team>", team.getChatColoredName())));
+                            
                         }
                     }
                     event.setWillClose(true);
@@ -85,14 +82,9 @@ public class TeamSelectorGui {
                 }
             }, plugin);
         }
-        int cnt = 0;
-        mapOptionTeam = new HashMap<Integer, Team>();
         
-        for (Map.Entry<String, Team> entry : teams.entrySet()) {
-            Team team = entry.getValue();
-            iconm.setOption(cnt, ColorUtils.bimapColorItemStack.get(team.getName()), team.getChatColoredName(), "Choisir l'équipe " + team.getChatColoredName());
-            mapOptionTeam.put(cnt, team);
-            cnt++;
+        for(Team team : ia.getTeams()){
+            iconm.setOption(ia.getTeams().indexOf(team), ColorUtils.bimapColorItemStack.get(team.getName()), team.getChatColoredName(), "Choisir l'équipe " + team.getChatColoredName());
         }
         
         iconm.open(Bukkit.getPlayerExact(playername));
@@ -103,3 +95,5 @@ public class TeamSelectorGui {
         
     }
 }
+
+        
