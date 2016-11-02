@@ -44,7 +44,7 @@ public class Debug {
 
             String path = new File(".").getCanonicalPath();
                         
-            DateFormat dateFormat = new SimpleDateFormat("d_m_Y_HH_mm_ss");
+            DateFormat dateFormat = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
             String logPath = path + "\\plugins\\BallsOfSteel\\logs\\" + dateFormat.format(new Date()) + ".log";
             File file = new File(logPath);
             file.getParentFile().mkdirs();
