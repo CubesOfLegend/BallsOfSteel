@@ -304,20 +304,20 @@ public class IArena extends Arena {
         //On récupére les joueurs qui sont en trop dans chacune des teams.
         for (Team team : teams) {
             
-            System.out.println(" - Team : " + team.getName() + " size = " + team.getPlayers().size());
+            System.out.println(" - Team : " + team.getName() + " size = " + team.getPlayersCount());
             
             //Joueurs en trop
-            if (team.getPlayers().size() > countPlayersByTeam) {
+            if (team.getPlayersCount() > countPlayersByTeam) {
                 
                 System.out.println(" -- Trop de joueurs");
                 
                 //Nombre de joueur à virer.
-                Integer countPlayersToMove = team.getPlayers().size() - countPlayersByTeam;
+                Integer countPlayersToMove = team.getPlayersCount() - countPlayersByTeam;
                 
                 //Récupération des joueurs en trop que l'on vire.
                 for (int i = 0; i < countPlayersToMove; i++) {
                     
-                    Integer lastPlayerIndex = team.getPlayers().size() - 1;
+                    Integer lastPlayerIndex = team.getPlayersCount() - 1;
                     
                     Player p = team.getPlayers().get(lastPlayerIndex).getPlayer();
                     System.out.println(" --- Moving " + p.getName() + "(" + lastPlayerIndex + ") to lobby one ( was " + team.getName() + ")");
@@ -340,11 +340,11 @@ public class IArena extends Arena {
             //On parcours les teams tant qu'elle ne sont pas complétes.
             for (Team team : teams) {
                 
-                System.out.println(" - Team : " + team.getName() + " size = " + team.getPlayers().size());
+                System.out.println(" - Team : " + team.getName() + " size = " + team.getPlayersCount());
                 
-                if (team.getPlayers().size() < countPlayersByTeam) {
+                if (team.getPlayersCount() < countPlayersByTeam) {
                     
-                    Integer countPlayersToMove = countPlayersByTeam - team.getPlayers().size();
+                    Integer countPlayersToMove = countPlayersByTeam - team.getPlayersCount();
                     System.out.println(" -- Team non complete");
                     
                     //Récupération du nombre de joueurs qu'il manque.
@@ -533,7 +533,7 @@ public class IArena extends Arena {
             if(teams.size()!=0){
                 System.out.println(" Printing teams ...");
                 for (Team team : teams) {
-                    System.out.println(" - - Team " + team.getName() + "(" + team.getPlayers().size() +")");
+                    System.out.println(" - - Team " + team.getName() + "(" + team.getPlayersCount() +")");
                     for (IPlayer player : team.getPlayers()) {
                         System.out.println(" - - - - " + player.getPlayer().getName());
                     }

@@ -16,7 +16,6 @@ import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.util.ArenaLobbyScoreboard;
 import com.comze_instancelabs.minigamesapi.util.Validator;
 import com.cubesoflegend.ballsofsteel.model.Team;
-import com.cubesoflegend.ballsofsteel.utils.Debug;
 
 public class IArenaLobbyScoreBoard extends ArenaLobbyScoreboard {
     
