@@ -212,7 +212,9 @@ public class Main extends JavaPlugin implements Listener {
                 IArena ia = (IArena) pli.getArenaByGlobalPlayer(event.getPlayer().getName());
                 
                 switch (ia.getArenaState()) {
+                //TODO l'etat STARTING n'est pas pris en compte.
                 case JOIN:
+                case STARTING:
                     
                     if (event.hasItem() && event.getItem().getType() == Material.WOOL) {
                         

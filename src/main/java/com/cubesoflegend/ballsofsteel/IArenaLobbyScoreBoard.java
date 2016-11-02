@@ -16,6 +16,7 @@ import com.comze_instancelabs.minigamesapi.PluginInstance;
 import com.comze_instancelabs.minigamesapi.util.ArenaLobbyScoreboard;
 import com.comze_instancelabs.minigamesapi.util.Validator;
 import com.cubesoflegend.ballsofsteel.model.Team;
+import com.cubesoflegend.ballsofsteel.utils.Debug;
 
 public class IArenaLobbyScoreBoard extends ArenaLobbyScoreboard {
     
@@ -64,7 +65,7 @@ public class IArenaLobbyScoreBoard extends ArenaLobbyScoreboard {
                     }
                     
                     for (Team team : arena.getTeams()) {
-                        aobjective.get(p__).getScore(Bukkit.getOfflinePlayer(team.getChatColoredName())).setScore(team.getPlayers().size());                    
+                        aobjective.get(p__).getScore(Bukkit.getOfflinePlayer(team.getChatColoredName())).setScore(team.getPlayersCount());                    
                     }
                     
                     p.setScoreboard(ascore.get(p__));

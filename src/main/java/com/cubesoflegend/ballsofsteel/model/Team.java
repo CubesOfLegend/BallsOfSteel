@@ -17,6 +17,7 @@ public class Team {
     private String name;
     private Base base;
     private Depot depot;
+    private Integer playersCount;
     private ItemStack itemCollect;
     private Integer score;
 
@@ -24,6 +25,7 @@ public class Team {
         this.players = new ArrayList<IPlayer>();
         this.blocks = new ArrayList<Block>();
         this.score = 0;
+        this.playersCount = 0;
         this.name = name;
         this.base = spawn;
         this.depot = depot;
@@ -62,10 +64,12 @@ public class Team {
 
     public void addPlayer(IPlayer player) {
         this.players.add(player);
+        this.updatePlayersCount();
     }
 
     public void removePlayer(IPlayer player) {
         this.players.remove(player);
+        this.updatePlayersCount();
     }
 
     public Base getBase() {
@@ -112,6 +116,14 @@ public class Team {
     
     public void setBlocks(ArrayList<Block> blocks){
         this.blocks = blocks;
+    }
+    
+    private void updatePlayersCount(){
+        this.playersCount = players.size();
+    }
+    
+    public Integer getPlayersCount(){
+        return this.playersCount;
     }
 
 }

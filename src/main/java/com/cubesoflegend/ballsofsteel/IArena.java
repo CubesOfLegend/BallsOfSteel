@@ -237,8 +237,6 @@ public class IArena extends Arena {
                 if (p != null) {
                     if (m.pli.containsGlobalPlayer(p.getName())) {
                         
-                        System.out.println("Update the inventory");
-                        
                         ItemStack teamselector = new ItemStack(Material.WOOL, 1, (byte) 14);
                         ItemMeta item = teamselector.getItemMeta();
                         item.setDisplayName(ChatColor.RED + "Team");
@@ -415,18 +413,22 @@ public class IArena extends Arena {
         
         //Si il a une team on le supprime de sa team
         if(player.getTeam() != null){
-            teams.get(teams.indexOf(player.getTeam())).removePlayer(player);
+            
+            Team oldTeam = player.getTeam();
+            oldTeam.removePlayer(player);
+            //teams.get(teams.indexOf(player.getTeam())).removePlayer(player);
         }
         
         //Aucune team asssignée 
         if (team == null) {
             
-            players.get(p).setTeam(null);
+            player.setTeam(null);
             
         } else {
             
-            teams.get(teams.indexOf(team)).addPlayer(player);
-            players.get(p).setTeam(team);
+            team.addPlayer(player);
+            //teams.get(teams.indexOf(team)).addPlayer(player);
+            player.setTeam(team);
             
             
         }

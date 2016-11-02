@@ -83,8 +83,8 @@ public class TeamSelectorGui {
             }, plugin);
         }
         
-        for(Team team : ia.getTeams()){
-            iconm.setOption(ia.getTeams().indexOf(team), ColorUtils.bimapColorItemStack.get(team.getName()), team.getChatColoredName(), "Choisir l'équipe " + team.getChatColoredName());
+        for(Team team : teams){
+            iconm.setOption(teams.indexOf(team), ColorUtils.bimapColorItemStack.get(team.getName()), team.getChatColoredName(), "Choisir l'équipe " + team.getChatColoredName());
         }
         
         iconm.open(Bukkit.getPlayerExact(playername));
