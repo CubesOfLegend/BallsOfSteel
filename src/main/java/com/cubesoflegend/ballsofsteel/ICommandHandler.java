@@ -75,13 +75,10 @@ public class ICommandHandler extends CommandHandler {
             } else if (action.equalsIgnoreCase(CommandStrings.SET_ITEM_COLLECT)) {
                 return this.setItemCollect(pli, sender, args, uber_permission, cmd, action, plugin, p);
             }
-            else {
-                sender.sendMessage("Unknown command. Type \"/bos\" for help.");
-            }
         }
-        
+
         return super.handleArgs(plugin, uber_permission, cmd, sender, args);
-        
+
     }
     
     @Override
